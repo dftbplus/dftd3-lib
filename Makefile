@@ -1,5 +1,5 @@
 
-  PROG = ./dftd3 
+PROG = ./dftd3 
 
 #--------------------------------------------------------------------------
  OSTYPE=LINUXL
@@ -7,78 +7,48 @@
 # source /usr/qc/intel/compiler70/ia32/bin/ifcvars.csh (Intel compiler)
 #--------------------------------------------------------------------------
 
- OBJS1=dftd3.o copyc6.o 
+OBJS= main.o dftd3.o copyc6.o param.o pars.o common.o
 
-OBJS2 = 
-
-OBJS = $(OBJS1) $(OBJS2)
 #--------------------------------------------------------------------------
 
 ifeq ($(OSTYPE),LINUXL)
-# FC = lf95 
+  #FC = lf95 
   FC = ifort
-#  FC = gfortran
-# CC = gcc
-# LINKER = lf95
+  #FC = gfortran
+  #LINKER = lf95
   LINKER = ifort -static
-#  LINKER = gfortran
-  PREFLAG = -E -P
-  CCFLAGS = -O -DLINUX 
-	FFLAGS= -O
-#  FFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
-#  LFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
-#  FFLAGS = -O  --chk a,e,s,u
-#  FFLAGS = -O0 -g 
-#  LFLAGS = -O0 -g
+  #LINKER = gfortran
+  FFLAGS= -O -C -traceback -g
+  #FFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
+  #LFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
+  #FFLAGS = -O  --chk a,e,s,u
+  #FFLAGS = -O0 -g 
+  #LFLAGS = -O0 -g
 endif
 
 ifeq ($(OSTYPE),LINUXI)
-  PREOPTS =
   FC = ifort 
-  CC = gcc
   LINKER = ifort   
-  LIBS    = 
-# LIBS    = -lmkl_ia32 -lmkl_lapack -lmkl_solver -lguide -lpthread -L/usr/qc/intel/mkl701/lib/32
-  PREFLAG = -E -P
-  CCFLAGS = -O -DLINUX
   FFLAGS = -w90 -O
+  #LFLAGS =
 endif                     
 
 # diese ziele gibts:
 .PHONY: all
 .PHONY: clean
+
 # dieses ist das erste auftretende,
 # wird also beim aufruf von make erzeugt (default)
 all: $(PROG)
 
 
 #--------------------------------------------------------------------------
-# example.f: printversion.h
-# example.f haengt von printversion.h ab
-# wenn sich also  printversion.h aendert, wird example.f
-# (und damit auch example.o) neu gemacht.
-# was auch geht:
+.SUFFIX:
+.SUFFIX: .f90 .o
 
-#--------------------------------------------------------------------------
-# implizite Regel zur Erzeugung von *.o aus *.F ausschalten
-%.o: %.F
-
-# aus *.F mache ein *.f
-%.f: %.F
-	@echo "making $@ from $<"
-	$(CC) $(PREFLAG) $(PREOPTS) $< -o $@
-
-# aus *.f mache ein *.o
-%.o: %.f
-	@echo "making $@ from $<"
+%.o: %.f90
 	$(FC) $(FFLAGS) -c $< -o $@
 
-# aus *.c mache ein *.o
-%.o: %.c
-	@echo "making $@ from $<"
-	$(CC) $(CCFLAGS) -c $< -o $@
-
-# linken
 $(PROG): $(OBJS) 
 	$(LINKER) $(OBJS) $(LIBS) -o $(PROG) $(LFLAGS)
 
@@ -86,6 +56,9 @@ $(PROG): $(OBJS)
 #aufraeumen
 clean:
 	rm -f *.o $(PROG) 
-	rm -f $(patsubst %.F, %.f, $(wildcard *.F))
 
 
+# Abhaengigkeiten
+main.o: dftd3.o
+dftd3.o: param.o copyc6.o common.o
+copyc6.o: pars.o common.o
