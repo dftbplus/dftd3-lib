@@ -7,7 +7,6 @@ OBJS = main.o
 .PHONY: all lib
 
 all: $(PROG)
-lib: $(LIBD3)
 
 
 .SUFFIX:
