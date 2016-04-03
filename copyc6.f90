@@ -219,12 +219,9 @@ contains
       !no min/max at all
     else
       do nn=1,nlines
-        print *, "KK:", kk
         iat=int(pars(kk+1))
         jat=int(pars(kk+2))
-        print *, "IAT, JAT:", iat, jat
         call limit(iat,jat,iadr,jadr)
-        print *, "IAT, JAT:", iat, jat
         maxci(iat)=max(maxci(iat),iadr)
         maxci(jat)=max(maxci(jat),jadr)
 

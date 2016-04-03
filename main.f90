@@ -27,9 +27,7 @@
 
 
 program dftd3
-  use dftd3_module
-  use copyc6_module
-  use param_module
+  use libdftd3_module
   implicit none
 
   integer maxat,max_elem,maxc

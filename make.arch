@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+ OSTYPE=LINUXL
+# source /usr/qc/lf95/csh_setup nicht vergessen (Lahey compiler)
+# source /usr/qc/intel/compiler70/ia32/bin/ifcvars.csh (Intel compiler)
+#--------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------
+
+ifeq ($(OSTYPE),LINUXL)
+  #FC = lf95 
+  FC = ifort
+  #FC = gfortran
+  #LINKER = lf95
+  LINKER = ifort -static
+  #LINKER = gfortran
+  FFLAGS= -O -C -traceback -g
+  #FFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
+  #LFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
+  #FFLAGS = -O  --chk a,e,s,u
+  #FFLAGS = -O0 -g 
+  #LFLAGS = -O0 -g
+endif
+
+ifeq ($(OSTYPE),LINUXI)
+  FC = ifort 
+  LINKER = ifort   
+  FFLAGS = -w90 -O
+  #LFLAGS =
+endif                     

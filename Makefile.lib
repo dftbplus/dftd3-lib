@@ -1,0 +1,42 @@
+################################################################################
+#
+# Library makefile
+#
+# Needs following variables
+#
+# FC  Fortran compiler
+# FCFLAGS  Fortran compiler flags
+# LN  Linker
+# LNFLAGS  Linker flags
+#
+################################################################################
+.SUFFIX:
+.SUFFIX: .f90 .o
+
+.PHONY: lib clean
+
+LIBD3 = libdftd3.a
+
+OBJS= libdftd3.o dftd3.o copyc6.o param.o pars.o common.o
+
+$(LIBD3): $(OBJS)
+	ar r $@ $^
+
+clean:
+	rm -f *.o *.mod $(LIBD3)
+
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -c $< -o $@
+
+
+$(PROG): $(OBJS) $(LIBD3) 
+	$(LINKER) $^ -o $@ $(LFLAGS)
+
+
+# Dependencies
+libdftd3.o: dftd3.o copyc6.o param.o
+dftd3.o: common.o param.o
+copyc6.o: param.o pars.o common.o
+param.o:
+pars.o:
