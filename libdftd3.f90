@@ -1,4 +1,4 @@
-module libdftd3
+module libdftd3_module
   use dftd3_module
   use copyc6_module
   use param_module
@@ -6,10 +6,13 @@ module libdftd3
   private
 
   public :: dftd3_input, dftd3
-  public :: dftd3_init, dftd3_set_params
+  public :: dftd3_init, dftd3_set_params, dftd3_set_functional
   public :: dftd3_dispersion, dftd3_pbc_dispersion
   public :: get_atomic_number
-  
+
+  public :: max_elem, maxc
+  public :: printoptions, stoprun, readl, rdatomnumber, pbcrdatomnumber
+  public :: rdcoord, pbcrdcoord, rdpar, pbcwregrad, outg
   
   integer, parameter :: wp = kind(1.0d0)
 
@@ -40,7 +43,7 @@ module libdftd3
     integer :: version
     real(wp) :: s6, rs6, s18, rs18, alp
     real(wp) :: rthr, cn_thr
-    real(wp) :: rep_vdw(3), rep_cn(3)
+    integer  :: rep_vdw(3), rep_cn(3)
     real(wp), allocatable :: r0ab(:,:), c6ab(:,:,:,:,:)
     integer, allocatable :: mxc(:)
   end type dftd3
@@ -171,9 +174,15 @@ contains
 
     integer :: natom
     real(wp) :: s6, s18, rs6, rs8, rs10, alp6, alp8, alp10
-    real(wp) :: e6, e8, e10, e12, e6abc
+    real(wp) :: e6, e8, e10, e12, e6abc, gnorm, disp2
     real(wp) :: rtmp3(3)
     integer :: rep_cn(3), rep_vdw(3)
+
+    if (present(grads) .neqv. present(stress)) then
+      write(*,*) "!!! Error in dftd3_pbc_dispersion"
+      write(*,*) "Either both grads and stress must be present or none of them"
+      stop
+    end if
 
     natom = size(coords, dim=2)
     s6 = this%s6
@@ -199,11 +208,11 @@ contains
       return
     end if
 
-    call pbdgdisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, &
+    grads(:,:) = 0.0_wp
+    call pbcgdisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, &
         & r2r4, this%r0ab, rcov, s6, s18, rs6, rs8, rs10, alp6, alp8, alp10, &
-        & this%noabc, this%numgrad, this%version, grads, gdisp, coords, &
-        & stress, latvecs, this%rep_vdw, this%rep_cn, this%rthr, .false., &
-        & this%cn_thr)
+        & this%noabc, this%numgrad, this%version, grads, disp2, gnorm, &
+        & stress, latvecs, rep_vdw, rep_cn, this%rthr, .false., this%cn_thr)
     
   end subroutine dftd3_pbc_dispersion
 
@@ -217,4 +226,4 @@ contains
   end function get_atomic_number
 
 
-end module libdftd3
+end module libdftd3_module

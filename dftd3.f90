@@ -4395,8 +4395,9 @@ contains
     real*8 abcthr,time1,time2,geomean2,r0av,dc9,dfdmp,dang,ang
     integer,dimension(3) ::repv,repmin,repmax,repmin2,repmax2
 
-
-
+    print *, "HERE?"
+    print *, max_elem,maxc,n, s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,num,&
+      & version,lat,rep_v,rep_cn, crit_vdw,echo,crit_cn
     ! R^2 cut-off
     rthr=crit_vdw
     abcthr=crit_cn

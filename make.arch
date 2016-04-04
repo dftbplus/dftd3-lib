@@ -10,20 +10,20 @@ ifeq ($(OSTYPE),LINUXL)
   #FC = lf95 
   FC = ifort
   #FC = gfortran
-  #LINKER = lf95
-  LINKER = ifort -static
-  #LINKER = gfortran
-  FFLAGS= -O -C -traceback -g
-  #FFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
-  #LFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
-  #FFLAGS = -O  --chk a,e,s,u
-  #FFLAGS = -O0 -g 
-  #LFLAGS = -O0 -g
+  #LN = lf95
+  LN = ifort -static
+  #LN = gfortran
+  FCFLAGS= -O -C -traceback -g
+  #FCFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
+  #LNFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
+  #FCFLAGS = -O  --chk a,e,s,u
+  #FCFLAGS = -O0 -g 
+  #LNFLAGS = -O0 -g
 endif
 
 ifeq ($(OSTYPE),LINUXI)
   FC = ifort 
-  LINKER = ifort   
-  FFLAGS = -w90 -O
-  #LFLAGS =
+  LN = ifort   
+  FCFLAGS = -w90 -O
+  #LNFLAGS =
 endif                     

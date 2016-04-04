@@ -3,3 +3,4 @@
 *.mod
 dftd3
 libdftd3.a
+test_libdftd3
