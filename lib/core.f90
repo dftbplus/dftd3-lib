@@ -2267,14 +2267,12 @@ contains
   ! Returns the number of a given element string (h-pu, 1-94)
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-  subroutine ELEM(KEY1, NAT)
-    CHARACTER*(*) KEY1
-    INTEGER :: NAT
+  elemental subroutine ELEM(KEY1, NAT)
+    CHARACTER(*), intent(in) :: KEY1
+    INTEGER, intent(out) :: NAT
 
-    CHARACTER*2 ELEMNT(94),E
-    integer :: k, j, n, i
-
-    DATA ELEMNT/'h ','he', &
+    character(2), parameter :: ELEMNT(94) = [&
+        & 'h ','he', &
         & 'li','be','b ','c ','n ','o ','f ','ne', &
         & 'na','mg','al','si','p ','s ','cl','ar', &
         & 'k ','ca','sc','ti','v ','cr','mn','fe','co','ni','cu', &
@@ -2284,7 +2282,10 @@ contains
         & 'cs','ba','la','ce','pr','nd','pm','sm','eu','gd','tb','dy', &
         & 'ho','er','tm','yb','lu','hf','ta','w ','re','os','ir','pt', &
         & 'au','hg','tl','pb','bi','po','at','rn', &
-        & 'fr','ra','ac','th','pa','u ','np','pu'/
+        & 'fr','ra','ac','th','pa','u ','np','pu' ]
+
+    CHARACTER(2) :: E
+    integer :: k, j, n, i
 
     nat=0
     e=' '
@@ -3073,9 +3074,6 @@ contains
     real(wp) abcthr,time1,time2,geomean2,r0av,dc9,dfdmp,dang,ang
     integer,dimension(3) ::repv,repmin,repmax,repmin2,repmax2
 
-    print *, "HERE?"
-    print *, max_elem,maxc,n, s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,num,&
-      & version,lat,rep_v,rep_cn, crit_vdw,echo,crit_cn
     ! R^2 cut-off
     rthr=crit_vdw
     abcthr=crit_cn

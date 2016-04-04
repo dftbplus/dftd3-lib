@@ -17,18 +17,18 @@
 
 LIBDIR = ../lib
 
-all: dftd3
+all: testapi
 
-OBJS_DFTD3  = extras.o main.o
+OBJS_TESTAPI = testapi.o
 
-dftd3: $(OBJS_DFTD3)
+testapi: $(OBJS_TESTAPI)
 	$(LN) $(LNFLAGS) -o $@ $^ -L$(LIBDIR) -ldftd3
 
 clean:
 	rm -f *.o *.mod
 
 distclean: clean
-	rm -f dftd3
+	rm -f testapi
 
 
 %.o: %.f90
@@ -36,4 +36,4 @@ distclean: clean
 
 
 # Dependencies
-dftd3.o: extras.o
+testapi.o:

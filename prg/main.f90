@@ -1,32 +1,29 @@
-! dftd3 program for computing the dispersion energy and forces from cart
-! and atomic numbers as described in
+! dftd3 program for computing the dispersion energy and forces from cartesian
+! atomic coordinates and atomic numbers as described in
 !
 ! S. Grimme, J. Antony, S. Ehrlich and H. Krieg
-! A consistent and accurate ab initio parameterization of density functi
-! (DFT-D) for the 94 elements H-Pu
+! A consistent and accurate ab initio parameterization of density functional 
+! dispersion correction (DFT-D) for the 94 elements H-Pu
 ! J. Chem. Phys, 132 (2010), 154104
-!
-! if BJ-damping is used
-! S. Grimme, S. Ehrlich and L. Goerigk, J. Comput. Chem, 32 (2011), 1456
+! 
+! if BJ-damping is used 
+! S. Grimme, S. Ehrlich and L. Goerigk, J. Comput. Chem, 32 (2011), 1456-1465.
 !
 ! should be cited as well.
 !
-! Copyright (C) 2009 - 2011 Stefan Grimme, University of Muenster, Germa
+! Copyright (C) 2009 - 2011 Stefan Grimme, University of Muenster, Germany
 !
 ! This program is free software; you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation; either version 1, or (at your option)
 ! any later version.
-
+!
 ! This program is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ! GNU General Public License for more details.
-
-! For the GNU General Public License, see <http://www.gnu.org/licenses/>
-
-
-program dftd3
+!
+program dftd3_main
   use dftd3_common
   use dftd3_core
   use dftd3_pars
@@ -43,34 +40,34 @@ program dftd3
   ! number of atoms
   integer n
   ! coordinates in au
-  real*8,dimension(:,:), allocatable :: xyz,abc
+  real(wp),dimension(:,:), allocatable :: xyz,abc
   ! fixed atoms in geometry opt
   logical fix(maxat)
   ! lattice in au
-  real*8 lat(3,3)
+  real(wp) lat(3,3)
   ! gradient
-  real*8,dimension(:,:), allocatable :: g
-  real*8 g_lat(3,3)
+  real(wp),dimension(:,:), allocatable :: g
+  real(wp) g_lat(3,3)
   ! cardinal numbers of elements
   integer,dimension(:), allocatable :: iz
   ! cut-off radii for all element pairs
-  real*8 r0ab(max_elem,max_elem)
+  real(wp) r0ab(max_elem,max_elem)
   ! C6 for all element pairs
-  real*8 c6ab(max_elem,max_elem,maxc,maxc,3)
+  real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
   ! how many different C6 for one element
   integer mxc(max_elem)
   ! C6810
-  real*8 c6,c8,c10
+  real(wp) c6,c8,c10
   ! coordination numbers of the atoms
-  real*8,dimension(:), allocatable :: cn
+  real(wp),dimension(:), allocatable :: cn
   ! covalent radii
-  !!real*8 rcov(max_elem)
+  !!real(wp) rcov(max_elem)
   ! atomic <r^2>/<r^4> values
-  !!real*8 r2r4(max_elem)
+  !!real(wp) r2r4(max_elem)
   ! energies
-  real*8 e6, e8, e10, e12, disp, e6abc
+  real(wp) e6, e8, e10, e12, disp, e6abc
   ! THE PARAMETERS OF THE METHOD (not all a "free")
-  real*8 rs6, rs8, rs10, s6, s18, alp6, alp8, alp10, s42, rs18, alp
+  real(wp) rs6, rs8, rs10, s6, s18, alp6, alp8, alp10, s42, rs18, alp
   ! printout option
   logical echo
   ! grad ?
@@ -88,16 +85,16 @@ program dftd3
   ! repetitions of the unitcell to match the rthr and c_thr
   integer rep_vdw(3),rep_cn(3)
   ! R^2 distance neglect threshold (important for speed in case of large s
-  real*8 rthr,rthr2
+  real(wp) rthr,rthr2
   ! R^2 distance to cutoff for CN_calculation
-  real*8 cn_thr
+  real(wp) cn_thr
   ! Integer for assigning only max/min cn C6 (0=normal, 1=min, 2=max)
   ! local and dummy variables
   character*80 atmp,btmp,ctmp,dtmp,etmp,ftmp,func
   integer i,j,k,z,nn,iat,jat,i1,i2
   integer ida(max_elem),ipot
-  real*8 x,y,dispr,displ,gdsp,dum,xx(10),dum6(86)
-  real*8 dum1,dum2,dum3(3)
+  real(wp) x,y,dispr,displ,gdsp,dum,xx(10),dum6(86)
+  real(wp) dum1,dum2,dum3(3)
   logical ex,pot,fdum
   logical minc6list(max_elem),maxc6list(max_elem),minc6,maxc6
 
@@ -776,4 +773,4 @@ program dftd3
   ! test test tesc test test tesc test test tesc test test tesc test test
 
 999 deallocate(xyz,g,iz,cn)
-end program dftd3
+end program dftd3_main

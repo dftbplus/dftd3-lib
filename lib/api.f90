@@ -13,10 +13,10 @@ module dftd3_api
 
   type :: dftd3_input
     ! Whether three body term should be calculated
-    logical :: threebody
+    logical :: threebody = .false.
 
     ! Numerical gradients instead of analytical ones
-    logical :: numgrad
+    logical :: numgrad = .false.
 
     ! C6 min flags (or unallocated if not needed)
     logical, allocatable :: minc6list(:)
@@ -25,10 +25,10 @@ module dftd3_api
     logical, allocatable :: maxc6list(:)
     
     ! Real space cutoff
-    real(wp) :: cutoff
+    real(wp) :: cutoff = sqrt(9000.0_wp)
 
     ! Real space cutoff for coordination numbers
-    real(wp) :: cutoff_cn
+    real(wp) :: cutoff_cn = sqrt(1600.0_wp)
   end type dftd3_input
 
 
@@ -211,7 +211,7 @@ contains
   end subroutine dftd3_pbc_dispersion
 
 
-  function get_atomic_number(species) result(izp)
+  elemental function get_atomic_number(species) result(izp)
     character(*), intent(in) :: species
     integer :: izp
 
