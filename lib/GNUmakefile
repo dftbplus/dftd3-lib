@@ -13,29 +13,22 @@
 .SUFFIX:
 .SUFFIX: .f90 .o
 
-.PHONY: lib clean distclean
+.PHONY: clean distclean
 
 LIBD3 = libdftd3.a
 
-TEST_LIBD3 = test_libdftd3
+OBJS  = api.o common.o core.o pars.o sizes.o
 
-D3OBJS= libdftd3.o dftd3.o copyc6.o param.o pars.o common.o
+all: $(LIBD3)
 
-OBJS = test_libdftd3.o
-
-all: $(LIBD3) $(TEST_LIBD3)
-
-$(LIBD3): $(D3OBJS)
+$(LIBD3): $(OBJS)
 	ar r $@ $^
-
-$(TEST_LIBD3): $(LIBD3) $(OBJS)
-	$(LN) -o $@ $(LNFLAGS) $^
 
 clean:
 	rm -f *.o
 
 distclean: clean
-	rm -f *.mod $(LIBD3) $(TEST_LIBD3)
+	rm -f *.mod $(LIBD3)
 
 
 %.o: %.f90
@@ -43,9 +36,8 @@ distclean: clean
 
 
 # Dependencies
-test_libdftd3.o: $(LIBD3)
-libdftd3.o: dftd3.o copyc6.o param.o
-dftd3.o: common.o param.o
-copyc6.o: param.o pars.o common.o
-param.o:
-pars.o:
+api.o: common.o core.o sizes.o
+common.o:
+core.o: common.o pars.o sizes.o
+pars.o: common.o sizes.o
+sizes.o:

@@ -1,20 +1,14 @@
-module libdftd3_module
-  use dftd3_module
-  use copyc6_module
-  use param_module
+module dftd3_api
+  use dftd3_sizes
+  use dftd3_common
+  use dftd3_core
   implicit none
   private
 
-  public :: dftd3_input, dftd3
+  public :: dftd3_input, dftd3_state
   public :: dftd3_init, dftd3_set_params, dftd3_set_functional
   public :: dftd3_dispersion, dftd3_pbc_dispersion
   public :: get_atomic_number
-
-  public :: max_elem, maxc
-  public :: printoptions, stoprun, readl, rdatomnumber, pbcrdatomnumber
-  public :: rdcoord, pbcrdcoord, rdpar, pbcwregrad, outg
-  
-  integer, parameter :: wp = kind(1.0d0)
 
 
   type :: dftd3_input
@@ -38,7 +32,7 @@ module libdftd3_module
   end type dftd3_input
 
 
-  type :: dftd3
+  type :: dftd3_state
     logical :: noabc, numgrad
     integer :: version
     real(wp) :: s6, rs6, s18, rs18, alp
@@ -46,13 +40,13 @@ module libdftd3_module
     integer  :: rep_vdw(3), rep_cn(3)
     real(wp), allocatable :: r0ab(:,:), c6ab(:,:,:,:,:)
     integer, allocatable :: mxc(:)
-  end type dftd3
-    
+  end type dftd3_state
+
 
 contains
 
   subroutine dftd3_init(this, input)
-    type(dftd3), intent(out) :: this
+    type(dftd3_state), intent(out) :: this
     type(dftd3_input), intent(in) :: input
 
     logical, allocatable :: minc6list(:), maxc6list(:)
@@ -90,7 +84,7 @@ contains
     
     
   subroutine dftd3_set_functional(this, func, version, tz)
-    type(dftd3), intent(inout) :: this
+    type(dftd3_state), intent(inout) :: this
     character(*), intent(in) :: func
     integer, intent(in) :: version
     logical, intent(in) :: tz
@@ -103,7 +97,7 @@ contains
 
 
   subroutine dftd3_set_params(this, pars, version)
-    type(dftd3), intent(inout) :: this
+    type(dftd3_state), intent(inout) :: this
     real(wp), intent(in) :: pars(:)
     integer, intent(in) :: version
 
@@ -123,7 +117,7 @@ contains
 
 
   subroutine dftd3_dispersion(this, coords, izp, disp, grads)
-    type(dftd3), intent(in) :: this
+    type(dftd3_state), intent(in) :: this
     real(wp), intent(in) :: coords(:,:)
     integer, intent(in) :: izp(:)
     real(wp), intent(out) :: disp
@@ -165,7 +159,7 @@ contains
 
   subroutine dftd3_pbc_dispersion(this, coords, izp, latvecs, disp, grads, &
       & stress)
-    type(dftd3), intent(in) :: this
+    type(dftd3_state), intent(in) :: this
     real(wp), intent(in) :: coords(:,:)
     integer, intent(in) :: izp(:)
     real(wp), intent(in) :: latvecs(:,:)
@@ -225,5 +219,5 @@ contains
 
   end function get_atomic_number
 
-
-end module libdftd3_module
+  
+end module dftd3_api
