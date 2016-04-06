@@ -149,6 +149,7 @@ contains
 
     allocate(fix(natom))
     fix(:) = .false.
+    grads(:,:) = 0.0_wp
     call gdisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, r2r4, &
         & this%r0ab, rcov, s6, s18, rs6, rs8, rs10, alp6, alp8, alp10, &
         & this%noabc, this%rthr, this%numgrad, this%version, .false., grads, &

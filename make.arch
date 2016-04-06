@@ -27,3 +27,17 @@ ifeq ($(OSTYPE),LINUXI)
   FCFLAGS = -w90 -O
   #LNFLAGS =
 endif                     
+
+ifeq ($(COMP),nagfor)
+FC = nagfor
+LN = nagfor
+FCFLAGS = -nan -C #-ieee=full
+LNFLAGS =
+endif
+
+ifeq ($(COMP),ifort)
+FC = ifort
+LN = ifort
+FCFLAGS = -C
+LNFLAGS =
+endif

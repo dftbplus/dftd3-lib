@@ -2,5 +2,6 @@
 *~
 *.mod
 dftd3
-libdftd3.a
-test_libdftd3
+lib/libdftd3.a
+prg/dftd3
+test/testapi

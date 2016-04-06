@@ -154,14 +154,17 @@ program dftd3_main
 
 
   ! get coord filename
-  call getarg(1,etmp)
+  !call getarg(1,etmp)
+  call get_command_argument(1,etmp)
   inquire(file=etmp,exist=ex)
   if (.not.ex) call printoptions
   ex=.false.
   ipot=0
   ! options
-  do i=1,iargc()
-    call getarg(i,ftmp)
+  !do i=1,iargc()
+  do i = 1, command_argument_count()
+    !call getarg(i,ftmp)
+    call get_command_argument(i, ftmp)
     if (index(ftmp,'-h') .ne.0) call printoptions
     if (index(ftmp,'-grad' ).ne.0) grad=.true.
     if (index(ftmp,'-anal' ).ne.0) anal=.true.
@@ -177,7 +180,8 @@ program dftd3_main
       minc6=.true.
       j=0
       do
-        call getarg(i+j+1,atmp)
+        !call getarg(i+j+1,atmp)
+        call get_command_argument(i+j+1,atmp)
         if (index(atmp,'-').eq.0.and.atmp.ne.'') then
           call elem(atmp,nn)
           if (nn.gt.max_elem.or.nn.lt.1) &
@@ -193,7 +197,8 @@ program dftd3_main
       maxc6=.true.
       k=0
       do
-        call getarg(i+k+1,atmp)
+        !call getarg(i+k+1,atmp)
+        call get_command_argument(i+k+1,atmp)
         if (index(atmp,'-').eq.0.and.atmp.ne.'') then
           call elem(atmp,nn)
           if (nn.gt.max_elem.or.nn.lt.1) &
@@ -207,25 +212,29 @@ program dftd3_main
     end if
     if (index(ftmp,'-pot') .ne.0) then
       pot=.true.
-      call getarg(i+1,atmp)
+      !call getarg(i+1,atmp)
+      call get_command_argument(i+1,atmp)
       call readl(atmp,xx,nn)
       ipot=idint(xx(1))
     end if
     if (index(ftmp,'-cnthr') .ne.0) then
-      call getarg(i+1,atmp)
+      !call getarg(i+1,atmp)
+      call get_command_argument(i+1,atmp)
       call readl(atmp,xx,nn)
       rthr2=xx(1)
       rthr2=rthr2**2
     end if
     if (index(ftmp,'-func') .ne.0) then
-      call getarg(i+1,func)
+      !call getarg(i+1,func)
+      call get_command_argument(i+1,func)
       ex=.true.
     end if
 
 
 
     if (index(ftmp,'-cutoff') .ne.0) then
-      call getarg(i+1,atmp)
+      !call getarg(i+1,atmp)
+      call get_command_argument(i+1,atmp)
       call readl(atmp,xx,nn)
       rthr=xx(1)**2
     end if
@@ -369,11 +378,11 @@ program dftd3_main
 
   ! output
   if (echo) then
-              write(*,'(/''#               XYZ [au]  '',12x,&
-     &              '' R0(AA) [Ang.]''2x,&
-     &              ''CN'',7x,&
-     &              ''C6(AA)     C8(AA)   C10(AA) [au] '')&
-     &            ')
+              write(*,"(/'#               XYZ [au]  ',12x,&
+     &              ' R0(AA) [Ang.]',2x,&
+     &              'CN',7x,&
+     &              'C6(AA)     C8(AA)   C10(AA) [au] ')&
+     &            ")
     x=0
     btmp=''
     do i=1,n
@@ -393,7 +402,7 @@ program dftd3_main
         atmp='f'
         btmp='f'
       end if
-      write(*,'(i4,3F10.5,3x,a2,1x,a1,F7.3,2x,F7.3,3F12.1,L)') &
+      write(*,'(i4,3F10.5,3x,a2,1x,a1,F7.3,2x,F7.3,3F12.1,L2)') &
           & i,xyz(1:3,i),esym(z),atmp, &
           & dum,cn(i), &
           & c6,c8,c10
@@ -576,7 +585,7 @@ program dftd3_main
     !      end if
     write(*,*)
     if (pbc) then
-      write(*,'('' Edisp /kcal,au,eV:'',f11.4,X,f12.8,X,f11.7)') &
+      write(*,'('' Edisp /kcal,au,eV:'',f11.4,1X,f12.8,1X,f11.7)') &
           & disp*autokcal,disp,disp*autoev
     else
       write(*,'('' Edisp /kcal,au:'',f11.4,f12.8)') disp*autokcal,disp
@@ -643,8 +652,8 @@ program dftd3_main
     ! check if gdisp yields same energy as edisp
     dum=abs((disp-gdsp)/disp)
     !if this check gives compiler errors, replace is with a different NaN ch
-    if (ISNAN(dum)) call stoprun('internal NaN-error')
-    ! if (dum/=dum) call stoprun('internal NaN-error')
+    !if (ISNAN(dum)) call stoprun('internal NaN-error')
+    if (dum/=dum) call stoprun('internal NaN-error')
     if (dum.gt.1.d-8) then
       write(*,*) disp,gdsp
       call stoprun('internal error')
@@ -756,7 +765,7 @@ program dftd3_main
         lat(j,i)=lat(j,i)+dum1
         call abc_to_xyz(abc,xyz,lat,n)
 
-        write(*,'("L"2i1,2E14.6)'),i,j,dum,g_lat(j,i)
+        write(*,'("L",2i1,2E14.6)') i,j,dum,g_lat(j,i)
         !j
       end do
       !i
