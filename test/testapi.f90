@@ -94,7 +94,7 @@ program testapi
   
 
   type(dftd3_input) :: input
-  type(dftd3_state) :: dftd3
+  type(dftd3_calc) :: dftd3
   integer :: atnum(nAtoms)
   real(wp) :: edisp
   real(wp) :: grads(3, nAtoms), stress(3, 3)

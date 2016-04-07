@@ -1,3 +1,5 @@
+!> This module contains the API to access DFT-D3 functionality.
+!!
 module dftd3_api
   use dftd3_sizes
   use dftd3_common
@@ -5,34 +7,39 @@ module dftd3_api
   implicit none
   private
 
-  public :: dftd3_input, dftd3_state
+  public :: dftd3_input, dftd3_calc
   public :: dftd3_init, dftd3_set_params, dftd3_set_functional
   public :: dftd3_dispersion, dftd3_pbc_dispersion
   public :: get_atomic_number
 
 
+  !> Input for a dftd3 calculator.
+  !!
   type :: dftd3_input
-    ! Whether three body term should be calculated
+    !> Whether three body term should be calculated
     logical :: threebody = .false.
 
-    ! Numerical gradients instead of analytical ones
+    !> Whether numerical gradients instead of analytical ones
     logical :: numgrad = .false.
 
-    ! C6 min flags (or unallocated if not needed)
+    !> C6 min flags (or unallocated if not needed)
     logical, allocatable :: minc6list(:)
 
-    ! C6 max flags (or unallocated if not needed)
+    !> C6 max flags (or unallocated if not needed)
     logical, allocatable :: maxc6list(:)
     
-    ! Real space cutoff
+    !> Real space cutoff in atomic units.
     real(wp) :: cutoff = sqrt(9000.0_wp)
 
-    ! Real space cutoff for coordination numbers
+    !> Real space cutoff for coordination numbers in atomic units
     real(wp) :: cutoff_cn = sqrt(1600.0_wp)
   end type dftd3_input
 
 
-  type :: dftd3_state
+  !> State of a dftd3 calculator.
+  !!
+  type :: dftd3_calc
+    private
     logical :: noabc, numgrad
     integer :: version
     real(wp) :: s6, rs6, s18, rs18, alp
@@ -40,13 +47,20 @@ module dftd3_api
     integer  :: rep_vdw(3), rep_cn(3)
     real(wp), allocatable :: r0ab(:,:), c6ab(:,:,:,:,:)
     integer, allocatable :: mxc(:)
-  end type dftd3_state
+  end type dftd3_calc
 
 
 contains
 
+  !> Initializes a dftd3 calculator.
+  !!
+  !! \note You also need to call dftd3_set_functional() or dftd3_set_params()
+  !!     before you can make an actual calculation.
+  !!
+  !! \param input  Input parameters for the calculator.
+  !!
   subroutine dftd3_init(this, input)
-    type(dftd3_state), intent(out) :: this
+    type(dftd3_calc), intent(out) :: this
     type(dftd3_input), intent(in) :: input
 
     logical, allocatable :: minc6list(:), maxc6list(:)
@@ -83,8 +97,14 @@ contains
   end subroutine dftd3_init
     
     
+  !> Sets the parameter for the dftd3 calculator by choosing a functional.
+  !!
+  !! \param func  Name of the functional.
+  !! \param version  Version to use.
+  !! \param tz  Whether special TZ-parameters should be used.
+  !!
   subroutine dftd3_set_functional(this, func, version, tz)
-    type(dftd3_state), intent(inout) :: this
+    type(dftd3_calc), intent(inout) :: this
     character(*), intent(in) :: func
     integer, intent(in) :: version
     logical, intent(in) :: tz
@@ -96,8 +116,16 @@ contains
   end subroutine dftd3_set_functional
 
 
+  !> Sets the parameter for the dftd3 calculator directly.
+  !!
+  !! \param pars  Parameter to use. The 5 parameters must follow the same 
+  !!     order as when specified in the dftd3.local file for the dftd3 program.
+  !!     (see the documentation of the dftd3 program for details)
+  !! \param version  Version to use. Note, that depending on the version the
+  !!     five parameters may have different (or no) meaning.
+  !!
   subroutine dftd3_set_params(this, pars, version)
-    type(dftd3_state), intent(inout) :: this
+    type(dftd3_calc), intent(inout) :: this
     real(wp), intent(in) :: pars(:)
     integer, intent(in) :: version
 
@@ -116,8 +144,16 @@ contains
   end subroutine dftd3_set_params
 
 
+  !> Calculates the dispersion for a given non-periodic configuration.
+  !!
+  !! \param coords  Coordinates of the atoms in atomic units. Shape: [3, nAtom].
+  !! \param izp  Atomic number of each atom. Shape: [nAtom]. You can determine
+  !!    the atomic number using the get_atomic_number() function.
+  !! \param disp  Calculated dispersion energy in atomic units.
+  !! \param grads  Calculated gradients in atomic units, if present.
+  !!
   subroutine dftd3_dispersion(this, coords, izp, disp, grads)
-    type(dftd3_state), intent(in) :: this
+    type(dftd3_calc), intent(in) :: this
     real(wp), intent(in) :: coords(:,:)
     integer, intent(in) :: izp(:)
     real(wp), intent(out) :: disp
@@ -158,9 +194,19 @@ contains
   end subroutine dftd3_dispersion
 
 
+  !> Calculates the dispersion for a given periodic configuration.
+  !!
+  !! \param coords  Coordinates of the atoms in atomic units. Shape: [3, nAtom].
+  !! \param izp  Atomic number of each atom. Shape: [nAtom]. You can determine
+  !!    the atomic number using the get_atomic_number() function.
+  !! \param latvecs  Lattice vectors in atomic units. Shape: [3, 3].
+  !! \param disp  Calculated dispersion energy in atomic units.
+  !! \param grads  Calculated gradiens in atomic units, if present.
+  !! \param stress  Calculated stress tensor in atomic units, if present.
+  !!
   subroutine dftd3_pbc_dispersion(this, coords, izp, latvecs, disp, grads, &
       & stress)
-    type(dftd3_state), intent(in) :: this
+    type(dftd3_calc), intent(in) :: this
     real(wp), intent(in) :: coords(:,:)
     integer, intent(in) :: izp(:)
     real(wp), intent(in) :: latvecs(:,:)
@@ -212,6 +258,11 @@ contains
   end subroutine dftd3_pbc_dispersion
 
 
+  !> Returns the atomic number for a given species.
+  !!
+  !! \param species  Chemical symbol of the species.
+  !! \return  Atomic number.
+  !!
   elemental function get_atomic_number(species) result(izp)
     character(*), intent(in) :: species
     integer :: izp
