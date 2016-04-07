@@ -97,8 +97,7 @@ contains
       return
     end if
     ! read parameter file from home directory
-    !call system('hostname > .tmpx')
-    call execute_command_line('hostname > .tmpx')
+    call system('hostname > .tmpx')
     open(unit=43,file='.tmpx')
     read(43,'(a)')ftmp
     close(43,status='delete')
@@ -802,8 +801,7 @@ contains
     close(42)
     close(43)
 
-    !call system('mv gradient.tmp gradient')
-    call execute_command_line('mv gradient.tmp gradient')
+    call system('mv gradient.tmp gradient')
 
     ! write file energy
     j=1
@@ -836,8 +834,7 @@ contains
     close(42)
     close(43)
 
-    !call system('mv energy.tmp energy')
-    call execute_command_line('mv energy.tmp energy')
+    call system('mv energy.tmp energy')
 
   end subroutine wregrad
 
@@ -2079,6 +2076,15 @@ contains
     str=adjustl(outstr)
 
   end subroutine removebksl
+
+
+  ! Uncomment this, if you work with the nagfor compiler
+  !subroutine system(command)
+  !  character(*), intent(in) :: command
+  !
+  !  call execute_command_line(command)
+  !
+  !end subroutine system
 
 
 end module dftd3_extras

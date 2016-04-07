@@ -1,43 +1,32 @@
-#--------------------------------------------------------------------------
- OSTYPE=LINUXL
-# source /usr/qc/lf95/csh_setup nicht vergessen (Lahey compiler)
-# source /usr/qc/intel/compiler70/ia32/bin/ifcvars.csh (Intel compiler)
-#--------------------------------------------------------------------------
+# Make your choice
+ARCH = x86_64-linux-gcc
 
-#--------------------------------------------------------------------------
-
-ifeq ($(OSTYPE),LINUXL)
-  #FC = lf95 
-  FC = ifort
-  #FC = gfortran
-  #LN = lf95
-  LN = ifort -static
-  #LN = gfortran
-  FCFLAGS= -O -C -traceback -g
-  #FCFLAGS = -O -openmp -I$(MKLROOT)/include -mkl=parallel
-  #LNFLAGS = -openmp -I$(MKLROOT)/include -mkl=parallel
-  #FCFLAGS = -O  --chk a,e,s,u
-  #FCFLAGS = -O0 -g 
-  #LNFLAGS = -O0 -g
+ifeq ($(ARCH),x86_64-linux-gcc)
+FC = gfortran
+LN = gfortran
+FCFLAGS =
+LNFLAGS =
 endif
 
-ifeq ($(OSTYPE),LINUXI)
-  FC = ifort 
-  LN = ifort   
-  FCFLAGS = -w90 -O
-  #LNFLAGS =
+ifeq ($(ARCH),x86_64-linux-intel)
+FC = ifort 
+LN = ifort   
+FCFLAGS =
+LNFLAGS =
 endif                     
 
-ifeq ($(COMP),nagfor)
+ifeq ($(ARCH),x86_64-linux-nag)
+# NOTE: you'll have to uncomment the function "system" at the end
+# of prg/extras.f90 when you want to build also the dftd3 standalone program
 FC = nagfor
 LN = nagfor
-FCFLAGS = -nan -C #-ieee=full
+FCFLAGS =
 LNFLAGS =
 endif
 
-ifeq ($(COMP),ifort)
-FC = ifort
-LN = ifort
-FCFLAGS = -C
-LNFLAGS =
+ifeq ($(ARCH),x86_64-linux-pgi)
+FC = pgfortran
+LN = pgfortran
+FCFLAGS =
+LNFLAGS = 
 endif

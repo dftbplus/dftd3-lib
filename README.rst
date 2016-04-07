@@ -21,22 +21,25 @@ split into two parts:
 Compilation
 ===========
 
-Edit the file `make.arch` to reflect your compiler and linker. Then issue
-``make``. This will build the following components:
+Edit the file `make.arch` to reflect your compiler and linker. Then you can
+issue one of the following commands:
 
-* The library `libdftd3.a` and necessery module files (`*.mod`) in the directory
-  `lib/`.
+* ``make lib``: to build the library `libdftd3.a` and the necessary
+  module files (`*.mod`) in the directory `lib/`.
 
-* The command line tool `dftd3` in the directory `prg/`.
+* ``make dftd3``: to build the executable `dftd3` in the directory `prg/`.
 
-* A simple tester for the library (`testapi`( in the directory `test/`. The
-  source code of this tester demonstrates how the library can be used.
+* ``make testapi``: to build a simple tester for the library (`testapi`) in the
+  directory `test/`. The source code of this tester demonstrates how the library
+  can be used by third party codes.
+
+If you just issue ``make``, all three targets will be compiled.
 
 
 Credits
 =======
 
-When using the library or the DFTD3 tool, please cite:
+When using the library or the dftd3 tool, please cite:
 
   S. Grimme, J. Antony, S. Ehrlich and H. Krieg
   J. Chem. Phys, 132 (2010), 154104.
