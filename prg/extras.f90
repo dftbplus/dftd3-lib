@@ -579,12 +579,12 @@ contains
 
     call readline(line,floats,strings,cs,cf)
     if (cf.eq.1.and.floats(1).gt.0) then
-      f=1./0.52917726d0
+      f=1.0d0 / autoang
       read(ich,'(A)',end=200)line
     else if (index(line,'$coord').ne.0) then
       f=1.0d0
     else if (index(line,'ang').ne.0) then
-      f=1./0.52917726d0
+      f=1.0d0 / autoang
     else if (index(line,'bohr').ne.0) then
       f=1.0d0
     end if
@@ -644,7 +644,7 @@ contains
     if (line.eq."") goto 300
     call readline(line,floats,strings,cs,cf)
     if (cf.eq.1.and.floats(1).gt.0.and.cs.eq.0) then
-      f=1./0.52917726d0
+      f=1.0d0 / autoang
       ! write(*,*)floats(1)
       n=int(floats(1))
       close(ich)
@@ -652,7 +652,7 @@ contains
     else if (index(line,'$coord').ne.0) then
       f=1.0d0
     else if (index(line,'ang').ne.0) then
-      f=1./0.52917726d0
+      f=1.0d0 / autoang
     else if (index(line,'bohr').ne.0) then
       f=1.0d0
     end if
@@ -2004,7 +2004,7 @@ contains
         ibsl=0
         cycle
       end if
-      if (ch == '\\') then
+      if (ch == '\') then
         k=k+1
         before(k:k)=ch
         ibsl=1
@@ -2066,7 +2066,7 @@ contains
         ibsl=0
         cycle
       end if
-      if (ch == '\\') then
+      if (ch == '\') then
         ibsl=1
         cycle
       end if

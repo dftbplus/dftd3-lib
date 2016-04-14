@@ -32,6 +32,9 @@ module dftd3_common
   ! Working precision (double precision)
   integer, parameter :: wp = kind(1.0d0)
 
+  ! Large integers
+  integer, parameter :: int64 = selected_int_kind(12)
+
   ! global ad hoc parameters
   real(wp), parameter :: k1 = 16.0
   real(wp), parameter :: k2 = 4./3.
@@ -50,7 +53,7 @@ module dftd3_common
   real(wp), parameter :: autokcal = 627.509541d0
   real(wp), parameter :: autoev = 27.21138505
   ! J/mol nm^6 - > au
-  real(wp), parameter :: c6conv = 1.d-3/2625.4999d0/((0.052917726d0)**6)
+  real(wp), parameter :: c6conv = 1.d-3/2625.4999d0/((autoang / 10.0d0)**6)
 
 
 contains

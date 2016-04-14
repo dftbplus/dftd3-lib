@@ -8,18 +8,22 @@
 # FCFLAGS  Fortran compiler flags
 # LN  Linker
 # LNFLAGS  Linker flags
+# SRCDIR  Folder, where source files can be found
 #
 ################################################################################
 .SUFFIX:
 .SUFFIX: .f90 .o
 
-.PHONY: clean distclean
-
 LIBD3 = libdftd3.a
 
-OBJS  = api.o common.o core.o pars.o sizes.o
-
 all: $(LIBD3)
+
+vpath % $(SRCDIR)
+
+.PHONY: clean distclean
+
+
+OBJS  = api.o common.o core.o pars.o sizes.o
 
 $(LIBD3): $(OBJS)
 	ar r $@ $^

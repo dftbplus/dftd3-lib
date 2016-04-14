@@ -698,7 +698,7 @@ contains
     real(wp) cn(n)
     real(wp) r2ab(n*n),cc6ab(n*n),dmp(n*n),d2(3),t1,t2,t3,a1,a2,tmp2
     real(wp) abcthr
-    integer*2 icomp(n*n)
+    integer(int64) icomp(n*n)
     integer ij,ik,jk,k
 
     e6 =0

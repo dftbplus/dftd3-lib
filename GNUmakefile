@@ -9,7 +9,7 @@ include make.arch
 
 lib:
 	$(MAKE) -C lib FC="$(FC)" FCFLAGS="$(FCFLAGS)" LN="$(LN)" \
-            LNFLAGS="$(LNFLAGS)"
+            LNFLAGS="$(LNFLAGS)" SRCDIR="."
 
 dftd3: lib
 	$(MAKE) -C prg FC="$(FC)" FCFLAGS="$(FCFLAGS)" LN="$(LN)" \
