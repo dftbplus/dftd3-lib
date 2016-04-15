@@ -21,8 +21,8 @@ all: dftd3
 
 OBJS_DFTD3  = extras.o main.o
 
-dftd3: $(OBJS_DFTD3)
-	$(LN) $(LNFLAGS) -o $@ $^ -L$(LIBDIR) -ldftd3
+dftd3: $(OBJS_DFTD3) $(LIBDIR)/libdftd3.a
+	$(LN) $(LNFLAGS) -o $@ $^
 
 clean:
 	rm -f *.o *.mod
