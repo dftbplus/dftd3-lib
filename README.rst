@@ -1,6 +1,6 @@
-========
-LIBDFTD3
-========
+=====
+DFTD3
+=====
 
 This is a repackaged version of the `DFTD3 program
 <http://www.thch.uni-bonn.de/tc/index.php?section=downloads&subsection=getd3>`_
