@@ -4957,16 +4957,25 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  function determinant(aa) result(det)
+    real(wp), intent(in) :: aa(:,:)
+    real(wp) :: det
+
+    det = aa(1,1) * (aa(2,2) * aa(3,3) - aa(3,2) * aa(2,3))&
+        & - aa(1,2) * (aa(2,1) * aa(3,3) - aa(3,1) * aa(2,3))&
+        & + aa(1,3) * (aa(2,1) * aa(3,2) - aa(3,1) * aa(2,2))
+    
+  end function determinant
+
+
   subroutine inv_cell(x,a)
     real(wp), intent(in) :: x(3,3)
     real(wp), intent(out) :: a(3,3)
     integer i
     real(wp) det
 
-    a=0.0
-    det=x(1,1)*x(2,2)*x(3,3)+x(1,2)*x(2,3)*x(3,1)+x(1,3)*x(2,1)*&
-        & x(3,2)-x(1,3)*x(2,2)*x(3,1)-x(1,2)*x(2,1)*x(3,3)-x(1,1)*&
-        & x(2,3)*x(3,2)
+    a = 0.0
+    det = determinant(x)
     ! write(*,*)'Det:',det
     a(1,1)=x(2,2)*x(3,3)-x(2,3)*x(3,2)
     a(2,1)=x(2,3)*x(3,1)-x(2,1)*x(3,3)

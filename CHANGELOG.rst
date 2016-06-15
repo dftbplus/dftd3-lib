@@ -2,6 +2,7 @@
 Change Log
 ==========
 
+
 Unreleased
 ==========
 
@@ -12,6 +13,11 @@ Added
   D. G. A. Smith, L. A. Burns, K. Patkowski, and C. D. Sherrill
   J. Phys. Chem. Lett., 2016, 7, pp 2197–2203.
   (Functionality corresponds to V3.2 Rev 0)
+
+Fixed
+-----
+
+* Routine dftd3_pbc_dispersion delivers now correct stress tensor.
 
 
 0.1
