@@ -2,6 +2,17 @@
 Change Log
 ==========
 
+Unreleased
+==========
+
+Added
+-----
+
+* Implementation of revised damping parameters as desribed in
+  D. G. A. Smith, L. A. Burns, K. Patkowski, and C. D. Sherrill
+  J. Phys. Chem. Lett., 2016, 7, pp 2197–2203.
+  (Functionality corresponds to V3.2 Rev 0)
+
 
 0.1
 ===
