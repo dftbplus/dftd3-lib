@@ -190,6 +190,93 @@ contains
     logical TZ
     ! double hybrid values revised according to procedure in the GMTKN30 pap
 
+
+    if(version.eq.6)then
+    s6  =1.0d0
+    alp =14.0d0
+! BJ damping with parameters from ...
+    select case (func)
+      case ("b2-plyp")
+           rs6 =0.486434
+           s18 =0.672820
+           rs18=3.656466                                                                                                                                              
+           s6  =0.640000                                                                                                                                              
+      case ("b3-lyp")                                                                                                                                                 
+           rs6 =0.278672                                                                                                                                              
+           s18 =1.466677
+           rs18=4.606311
+      case ("b97-d")
+           rs6 =0.240184
+           s18 =1.206988
+           rs18=3.864426
+      case ("b-lyp")
+           rs6 =0.448486
+           s18 =1.875007
+           rs18=3.610679
+      case ("b-p")
+           rs6 =0.821850
+           s18 =3.140281
+           rs18=2.728151
+      case ("pbe")
+           rs6 =0.012092
+           s18 =0.358940
+           rs18=5.938951
+      case ("pbe0")
+           rs6 =0.007912
+           s18 =0.528823
+           rs18=6.162326
+      case ("lc-wpbe")
+           rs6 =0.563761
+           s18 =0.906564
+           rs18=3.593680
+      case DEFAULT
+            call stoprun( 'functional name unknown' )
+    end select
+    endif
+
+    if(version.eq.5)then
+    s6  =1.0d0
+    alp =14.0d0
+! zero damping with parameters from ...
+    select case (func)
+      case ("b2-plyp")
+           rs6 =1.313134
+           s18 =0.717543
+           rs18=0.016035
+           s6  =0.640000
+      case ("b3-lyp")
+           rs6 =1.338153
+           s18 =1.532981
+           rs18=0.013988
+      case ("b97-d")
+           rs6 =1.151808
+           s18 =1.020078
+           rs18=0.035964
+      case ("b-lyp")
+           rs6 =1.279637
+           s18 =1.841686
+           rs18=0.014370
+      case ("b-p")
+           rs6 =1.233460
+           s18 =1.945174
+           rs18=0.000000
+      case ("pbe")
+           rs6 =2.340218
+           s18 =0.000000
+           rs18=0.129434
+      case ("pbe0")
+           rs6 =2.077949
+           s18 =0.000081
+           rs18=0.116755
+      case ("lc-wpbe")
+           rs6 =1.366361
+           s18 =1.280619
+           rs18=0.003160
+      case DEFAULT
+            call stoprun( 'functional name unknown' )
+    end select
+    endif
+
     ! DFT-D3 with Becke-Johnson finite-damping, variant 2 with their radii
     ! SE: Alp is only used in 3-body calculations
     if (version.eq.4)then
@@ -746,12 +833,22 @@ contains
           !THR
           if (r2.gt.rthr) cycle
           r =sqrt(r2)
-          rr=r0ab(iz(jat),iz(iat))/r
+          tmp2=r0ab(iz(jat),iz(iat))
+          rr=tmp2/r
           ! damping
-          tmp=rs6*rr
-          damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
-          tmp=rs8*rr
-          damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+          if(version.eq.3)then
+            ! DFT-D3 zero-damp
+            tmp=rs6*rr
+            damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
+            tmp=rs8*rr
+            damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+          else
+            ! DFT-D3M zero-damp
+            tmp=(r/(rs6*tmp2))+rs8*tmp2
+            damp6 =1.d0/( 1.d0+6.d0*tmp**(-alp6) )
+            tmp=(r/tmp2)+rs8*tmp2
+            damp8 =1.d0/( 1.d0+6.d0*tmp**(-alp8) )
+          endif
           ! get C6
           call getc6(maxc,max_elem,c6ab,mxc,iz(iat),iz(jat), &
               & cn(iat),cn(jat),c6)
@@ -761,13 +858,13 @@ contains
           ! r2r4 stored in main as sqrt
           c8 =3.0d0*c6*r2r4(iz(iat))*r2r4(iz(jat))
 
-          ! DFT-D3 zero-damp
-          if (version.eq.3)then
+          ! DFT-D3 zero-damp or DFT-D3 M(zero)
+          if((version.eq.3).or.(version.eq.5))then
             e6=e6+c6*damp6/r6
             e8=e8+c8*damp8/r8
           end if
-          ! DFT-D3(BJ)
-          if (version.eq.4)then
+          ! DFT-D3(BJ) or DFT-D3M(BJ)
+          if((version.eq.4).or.(version.eq.6))then
             ! use BJ radius
             tmp=sqrt(c8/c6)
             e6=e6+ c6/(r6+(a1*tmp+a2)**6)
@@ -971,7 +1068,7 @@ contains
 
       ! 3333333333333333333333333333333333333333333333333333333333333333333333
       ! zero damping
-    elseif (version.eq.3) then
+    elseif ((version.eq.3).or.(version.eq.5)) then
 
       if (echo)write(*,*) 'doing analytical gradient O(N^2) ...'
       call ncoord(n,rcov,iz,xyz,cn,cn_thr)
@@ -1013,22 +1110,43 @@ contains
 
           !
           ! Calculates damping functions:
-          t6 = (r/(rs6*R0))**(-alp6)
-          damp6 =1.d0/( 1.d0+6.d0*t6 )
-          t8 = (r/(rs8*R0))**(-alp8)
-          damp8 =1.d0/( 1.d0+6.d0*t8 )
+          if (version.eq.3) then
+            t6 = (r/(rs6*R0))**(-alp6)
+            damp6 =1.d0/( 1.d0+6.d0*t6 )
+            t8 = (r/(rs8*R0))**(-alp8)
+            damp8 =1.d0/( 1.d0+6.d0*t8 )
+  
+            tmp1=s6*6.d0*damp6*C6/r7
+            tmp2=s8*6.d0*C6*r42*damp8/r9
+            ! d(r^(-6))/d(r_ij)
+            drij(linij)=drij(linij)-tmp1 &
+                & -4.d0*tmp2
+  
+  
+            drij(linij)=drij(linij) &
+                & +tmp1*alp6*t6*damp6 &
+                & +3.d0*tmp2*alp8*t8*damp8
+            !d(f_dmp)/d(r_ij)
 
-          tmp1=s6*6.d0*damp6*C6/r7
-          tmp2=s8*6.d0*C6*r42*damp8/r9
-          ! d(r^(-6))/d(r_ij)
-          drij(linij)=drij(linij)-tmp1 &
-              & -4.d0*tmp2
+          else ! version.eq.5
+            t6 = (r/(rs6*R0)+R0*rs8)**(-alp6)
+            damp6 =1.d0/( 1.d0+6.d0*t6 )
+            t8 = (r/R0+R0*rs8)**(-alp8)
+            damp8 =1.d0/( 1.d0+6.d0*t8 )
+  
+            tmp1=s6*6.d0*damp6*C6/r7
+            tmp2=s8*6.d0*C6*r42*damp8/r9
+            ! d(r^(-6))/d(r_ij)
+            drij(linij)=drij(linij)-tmp1 &  
+                &  -4.d0*tmp2
+  
+  
+            drij(linij)=drij(linij) &
+                & +tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) & 
+                & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8)
+            !d(f_dmp)/d(r_ij)
 
-
-          drij(linij)=drij(linij) &
-              & +tmp1*alp6*t6*damp6 &
-              & +3.d0*tmp2*alp8*t8*damp8
-          !d(f_dmp)/d(r_ij)
+          end if
 
 
           if ((.not.noabc).and.(r2.lt.abcthr)) then
@@ -1063,11 +1181,11 @@ contains
 
 
 
-      ! end if !version 3
+      ! end if !version 3+5
 
       ! BJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJBJ
       ! Becke-Johnson finite damping
-    elseif (version.eq.4) then
+    elseif ((version.eq.4).or.(version.eq.6)) then
       a1 =rs6
       a2 =rs8
       s8 =s18
@@ -2393,7 +2511,7 @@ contains
     logical noabc
 
     integer iat,jat,kat
-    real(wp) r,r2,r6,r8,tmp,dx,dy,dz,c6,c8,c10,ang,rav
+    real(wp) r,r2,r6,r8,tmp,dx,dy,dz,c6,c8,c10,ang,rav,R0
     real(wp) damp6,damp8,damp10,rr,thr,c9,r42,c12,r10,c14
     real(wp) cn(n),rxyz(3),dxyz(3)
     real(wp) r2ab(n*n),cc6ab(n*n),dmp(n*n),d2(3),t1,t2,t3,tau(3)
@@ -2468,7 +2586,7 @@ contains
 
 
 
-    else if (version.eq.3) then
+    else if ((version.eq.3).or.(version.eq.5)) then
       ! DFT-D3(zero-damping)
 
       call pbcncoord(n,rcov,iz,xyz,cn,lat,rep_cn,crit_cn)
@@ -2497,13 +2615,22 @@ contains
 
                 if (r2.gt.rthr) cycle
                 r =sqrt(r2)
-                rr=r0ab(iz(jat),iz(iat))/r
+                R0=r0ab(iz(jat),iz(iat))
+                rr=R0/r
                 ! damping
-                tmp=rs6*rr
-                damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
-                tmp=rs8*rr
-                damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
-
+                if(version.eq.3)then
+                  ! DFT-D3 zero-damp
+                  tmp=rs6*rr
+                  damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
+                  tmp=rs8*rr
+                  damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+                else
+                  ! DFT-D3M zero-damp
+                  tmp=(r/(rs6*R0))+rs8*R0
+                  damp6 =1.d0/( 1.d0+6.d0*tmp**(-alp6) )
+                  tmp=(r/R0)+rs8*R0
+                  damp8 =1.d0/( 1.d0+6.d0*tmp**(-alp8) )
+                endif
 
                 r6=r2**3
                 e6 =e6+damp6/r6* c6
@@ -2545,12 +2672,23 @@ contains
               ! cutoff
               if (r2.gt.rthr) cycle
               r =sqrt(r2)
-              rr=r0ab(iz(jat),iz(iat))/r
-              ! damping
-              tmp=rs6*rr
-              damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
-              tmp=rs8*rr
-              damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+              R0=r0ab(iz(jat),iz(iat))
+              rr=R0/r
+
+              ! damping 
+              if(version.eq.3)then
+                ! DFT-D3 zero-damp
+                tmp=rs6*rr
+                damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
+                tmp=rs8*rr
+                damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+              else
+                ! DFT-D3M zero-damp
+                tmp=(r/(rs6*R0))+rs8*R0
+                damp6 =1.d0/( 1.d0+6.d0*tmp**(-alp6) )
+                tmp=(r/R0)+rs8*R0
+                damp8 =1.d0/( 1.d0+6.d0*tmp**(-alp8) )
+              endif
 
 
               r6=r2**3
@@ -2569,7 +2707,7 @@ contains
         end do
       end do
       ! write(*,*)'counter(edisp): ',counter
-    else if (version.eq.4) then
+    else if((version.eq.4).or.(version.eq.6)) then
 
 
       ! DFT-D3(BJ-damping)
@@ -3257,7 +3395,7 @@ contains
       goto 999
     end if
 
-    if (version.eq.3) then
+    if ((version.eq.3).or.(version.eq.5)) then
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !
       ! begin ZERO DAMPING GRADIENT
@@ -3319,21 +3457,38 @@ contains
 
                 !
                 ! Calculates damping functions:
-                t6 = (r/(rs6*R0))**(-alp6)
-                damp6 =1.d0/( 1.d0+6.d0*t6 )
-                t8 = (r/(rs8*R0))**(-alp8)
-                damp8 =1.d0/( 1.d0+6.d0*t8 )
+                if (version.eq.3) then
+                  t6 = (r/(rs6*R0))**(-alp6)
+                  damp6 =1.d0/( 1.d0+6.d0*t6 )
+                  t8 = (r/(rs8*R0))**(-alp8)
+                  damp8 =1.d0/( 1.d0+6.d0*t8 )
 
-                drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat,&
-                    & iat))&
-                    & +(-s6*(6.0/(r7)*C6*damp6)&
-                    & -s8*(24.0/(r9)*C6*r42*damp8))*0.5d0
+                  drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat,&
+                      & iat))&
+                      & +(-s6*(6.0/(r7)*C6*damp6)&
+                      & -s8*(24.0/(r9)*C6*r42*damp8))*0.5d0
 
 
-                drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat,&
-                    & iat))&
-                    & +(s6*C6/r7*6.d0*alp6*t6*damp6*damp6&
-                    & +s8*C6*r42/r9*18.d0*alp8*t8*damp8*damp8)*0.5d0
+                  drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat,&
+                      & iat))&
+                      & +(s6*C6/r7*6.d0*alp6*t6*damp6*damp6&
+                      & +s8*C6*r42/r9*18.d0*alp8*t8*damp8*damp8)*0.5d0
+                else !version.eq.5
+                  t6 = (r/(rs6*R0)+R0*rs8)**(-alp6)
+                  damp6 =1.d0/( 1.d0+6.d0*t6 )
+                  t8 = (r/(R0)+R0*rs8)**(-alp8)
+                  damp8 =1.d0/( 1.d0+6.d0*t8 )
+  
+                  tmp1=s6*6.d0*damp6*C6/r7
+                  tmp2=s8*6.d0*C6*r42*damp8/r9
+                  drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat, &
+                      & iat)) - (tmp1 +4.d0*tmp2)*0.5d0               ! d(r^(-6))/d(r_ij)
+  
+  
+                  drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat, &
+                      & iat)) +(tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) &
+                      & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8))*0.5d0  !d(f_dmp)/d(r_ij)
+                endif
                 !
                 ! in dC6_rest all terms BUT C6-term is saved for the kat-loop
                 !
@@ -3396,20 +3551,37 @@ contains
 
                 !
                 ! Calculates damping functions:
-                t6 = (r/(rs6*R0))**(-alp6)
-                damp6 =1.d0/( 1.d0+6.d0*t6 )
-                t8 = (r/(rs8*R0))**(-alp8)
-                damp8 =1.d0/( 1.d0+6.d0*t8 )
+                if (version.eq.3) then
+                  t6 = (r/(rs6*R0))**(-alp6)
+                  damp6 =1.d0/( 1.d0+6.d0*t6 )
+                  t8 = (r/(rs8*R0))**(-alp8)
+                  damp8 =1.d0/( 1.d0+6.d0*t8 )
 
-                drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,&
-                    & linij)&
-                    & -s6*(6.0/(r7)*C6*damp6)&
-                    & -s8*(24.0/(r9)*C6*r42*damp8)
+                  drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,&
+                      & linij)&
+                      & -s6*(6.0/(r7)*C6*damp6)&
+                      & -s8*(24.0/(r9)*C6*r42*damp8)
 
-                drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,&
-                    & linij)&
-                    & +s6*C6/r7*6.d0*alp6*t6*damp6*damp6&
-                    & +s8*C6*r42/r9*18.d0*alp8*t8*damp8*damp8
+                  drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,&
+                      & linij)&
+                      & +s6*C6/r7*6.d0*alp6*t6*damp6*damp6&
+                      & +s8*C6*r42/r9*18.d0*alp8*t8*damp8*damp8
+                else !version.eq.5
+                  t6 = (r/(rs6*R0)+R0*rs8)**(-alp6)
+                  damp6 =1.d0/( 1.d0+6.d0*t6 )
+                  t8 = (r/(R0)+R0*rs8)**(-alp8)
+                  damp8 =1.d0/( 1.d0+6.d0*t8 )
+  
+                  tmp1=s6*6.d0*damp6*C6/r7
+                  tmp2=s8*6.d0*C6*r42*damp8/r9
+                  drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux, &
+                      & linij) - (tmp1 +4.d0*tmp2)  ! d(r^(-6))/d(r_ij)
+  
+  
+                  drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,linij) &
+                      & +(tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) & 
+                      & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8)) !d(f_dmp)/d(r_ij)
+                endif
                 !
                 ! in dC6_rest all terms BUT C6-term is saved for the kat-loop
                 !
@@ -3434,7 +3606,7 @@ contains
 
       end do
 
-    elseif (version.eq.4) then
+    elseif ((version.eq.4).or.(version.eq.6)) then
 
 
 
