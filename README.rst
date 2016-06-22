@@ -17,6 +17,9 @@ split into two parts:
 * Additional extensions which are necessary for the command line tool DFTD3 and
   the command line tool itself.
 
+* Updated dftd3 code to include refitted/modified zero- and BJ-damped D3
+  versions of Sherrill and coworkers (-bjm and -zerom)
+  (Functionality corresponds to V3.2 Rev0)
 
 Compilation
 ===========

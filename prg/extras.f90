@@ -55,6 +55,8 @@ contains
     write(*,*) '-old (DFT-D2)'
     write(*,*) '-zero (DFT-D3 original zero-damping)'
     write(*,*) '-bj (DFT-D3 with Becke-Johnson finite-damping)'
+    write(*,*) '-zerom (revised DFT-D3 original zero-damping)'
+    write(*,*) '-bjm (revised DFT-D3 with Becke-Johnson damping)'
     write(*,*) '-tz (use special parameters for TZ-type calculations)'
     write(*,*) 'variable parameters can be read from <current-director&
         &y>/.dftd3par.local'
@@ -213,10 +215,19 @@ contains
         rr=R0/r
         r6=r2**3
 
-        tmp=rs6*rr
-        damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
-        tmp=rs8*rr
-        damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+        if(version.eq.3)then
+          ! DFT-D3 zero-damp
+          tmp=rs6*rr
+          damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
+          tmp=rs8*rr
+          damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+        else
+          ! DFT-D3M zero-damp
+          tmp=(r/(rs6*R0))+rs8*R0
+          damp6 =1.d0/( 1.d0+6.d0*tmp**(-alp6) )
+          tmp=(r/R0)+rs8*R0
+          damp8 =1.d0/( 1.d0+6.d0*tmp**(-alp8) )
+        endif
 
         if (version.eq.2)then
           c6=c6ab(iz(jat),iz(iat),1,1,1)
@@ -228,7 +239,7 @@ contains
               & cn(iat),cn(jat),c6)
         end if
 
-        if (version.eq.3)then
+        if((version.eq.3).or.(version.eq.5))then
           e6 =s6*autokcal*c6*damp6/r6
           r8 =r6*r2
           r42=r2r4(iz(iat))*r2r4(iz(jat))
@@ -236,7 +247,7 @@ contains
           e8 =s18*autokcal*c8*damp8/r8
         end if
 
-        if (version.eq.4)then
+        if((version.eq.4).or.(version.eq.6))then
           r42=r2r4(iz(iat))*r2r4(iz(jat))
           c8 =3.0d0*c6*r42
           ! use BJ radius
@@ -1650,10 +1661,17 @@ contains
               rr=R0/r
               r6=r2**3
 
-              tmp=rs6*rr
-              damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
-              tmp=rs8*rr
-              damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+              if(version.eq.3)then
+                tmp=rs6*rr
+                damp6 =1.d0/( 1.d0+6.d0*tmp**alp6 )
+                tmp=rs8*rr
+                damp8 =1.d0/( 1.d0+6.d0*tmp**alp8 )
+              else
+                tmp=(r/(R0*rs6)+R0*rs8)**(-alp6)
+                damp6 =1.d0/( 1.d0+6.d0*tmp )
+                tmp=(r/(R0)+R0*rs8)**(-alp8)
+                damp8 =1.d0/( 1.d0+6.d0*tmp )
+              endif
 
               if (version.eq.2)then
                 c6=c6ab(iz(jat),iz(iat),1,1,1)
@@ -1669,7 +1687,7 @@ contains
                     & cn(iat),cn(jat),c6)
               end if
 
-              if (version.eq.3)then
+              if((version.eq.3).or.(version.eq.5))then
                 r8 =r6*r2
                 r42=r2r4(iz(iat))*r2r4(iz(jat))
                 c8 =3.0d0*c6*r42
@@ -1682,7 +1700,7 @@ contains
                 end if
               end if
 
-              if (version.eq.4)then
+              if((version.eq.4).or.(version.eq.6))then
                 r42=r2r4(iz(iat))*r2r4(iz(jat))
                 c8 =3.0d0*c6*r42
                 ! use BJ radius

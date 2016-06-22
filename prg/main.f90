@@ -180,6 +180,8 @@ program dftd3_main
     if (index(ftmp,'-old') .ne.0) version=2
     if (index(ftmp,'-zero') .ne.0) version=3
     if (index(ftmp,'-bj') .ne.0) version=4
+    if (index(ftmp,'-zerom') .ne.0) version=5
+    if (index(ftmp,'-bjm') .ne.0) version=6
     if (index(ftmp,'-min') .ne.0) then
       minc6=.true.
       j=0
@@ -331,13 +333,16 @@ program dftd3_main
     write(*,*)'J. Comput. Chem. 32 (2011), 1456-1465'
     write(*,*)'For DFT-D2 the reference is'
     write(*,*)'S. Grimme, J. Comput. Chem., 27 (2006), 1787-1799'
+    write(*,*)'For DFT-D3M or DFT-D3M(BJ) the reference is'
+    write(*,*)'D.G.A. Smith, L.A. Burns, K. Patkowski, and '
+    write(*,*)'C.D. Sherrill, J. Phys. Chem. Lett. 7 (2016) 2197-2203'
     write(*,*)
     write(*,*)' files read :     '
     write(*,*)trim(etmp)
     if (.not.ex)write(*,*)trim(dtmp)
   end if
 
-  if (version.lt.2.or.version.gt.4)stop 'inacceptable version number'
+  if (version.lt.2.or.version.gt.6)stop 'inacceptable version number'
 
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
   ! all calculations start here
@@ -400,7 +405,9 @@ program dftd3_main
       c8 =r2r4(iz(i))**2*3.0d0*c6
       c10=(49.0d0/40.0d0)*c8**2/c6
       dum=0.5*autoang*r0ab(z,z)
-      if (version.eq.4)dum=rs6*0.5*autoang*sqrt(c8/c6)
+      if((version.eq.4).or.(version.eq.6))then
+        dum=rs6*0.5*autoang*sqrt(c8/c6)
+      endif
       atmp=' '
       if (fix(i)) then
         atmp='f'
@@ -555,11 +562,16 @@ program dftd3_main
 
   ! output
   if (echo) then
+
     if(version.lt.4)then
       write(*,'(/10x,'' DFT-D V'',i1)') version       
-    else
-      write(*,'(/10x,'' DFT-D V3(BJ)'')') 
-    end if
+    elseif(version.eq.4)then
+      write(*,'(/10x,'' DFT-D V3(BJ)'')')
+    elseif(version.eq.5)then
+      write(*,'(/10x,'' DFT-D V3 M'')')
+    elseif(version.eq.6)then
+      write(*,'(/10x,'' DFT-D V3 M(BJ)'')')
+    endif
     write(*,'('' DF '',a50)') func          
     write(*,'('' parameters'')') 
     if(version.eq.2)then
@@ -575,13 +587,22 @@ program dftd3_main
       write(*,'('' alpha8   :'',f10.4)') alp8           
       write(*,'('' k1-k3    :'',3f10.4)') k1,k2,k3     
     end if
-    if(version.eq.4)then
-      write(*,'('' s6       :'',F23.15)') s6            
-      write(*,'('' s8       :'',F23.15)') s18           
-      write(*,'('' a1       :'',F23.15)') rs6           
-      write(*,'('' a2       :'',F23.15)') rs18          
-      write(*,'('' k1-k3    :'',3F23.15)') k1,k2,k3     
+    if((version.eq.4).or.(version.eq.6))then
+      write(*,'('' s6       :'',F10.4)') s6            
+      write(*,'('' s8       :'',F10.4)') s18           
+      write(*,'('' a1       :'',F10.4)') rs6           
+      write(*,'('' a2       :'',F10.4)') rs18          
+      write(*,'('' k1-k3    :'',3F10.4)') k1,k2,k3     
     end if
+    if(version.eq.5)then
+      write(*,'('' s6       :'',f10.4)') s6
+      write(*,'('' s8       :'',f10.4)') s18
+      write(*,'('' rs6      :'',f10.4)') rs6
+      write(*,'('' beta     :'',f10.4)') rs18
+      write(*,'('' alpha6   :'',f10.4)') alp6
+      write(*,'('' alpha8   :'',f10.4)') alp8
+      write(*,'('' k1-k3    :'',3f10.4)') k1,k2,k3
+    endif
     write(*,'('' Cutoff   :'',f10.4,'' a.u.'')') sqrt(rthr) !*autoang
     write(*,'('' CN-Cutoff:'',f10.4,'' a.u.'')')sqrt(cn_thr)!*autoang
     !      if (pbc) then

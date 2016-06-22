@@ -215,7 +215,7 @@ contains
   !!
   !! \param coords  Coordinates of the atoms in atomic units. Shape: [3, nAtom].
   !! \param izp  Atomic number of each atom. Shape: [nAtom]. You can determine
-  !!    the atomic number using the get_atomic_number() function.
+  !!     the atomic number using the get_atomic_number() function.
   !! \param latvecs  Lattice vectors in atomic units. Shape: [3, 3].
   !! \param disp  Calculated dispersion energy in atomic units.
   !! \param grads  Calculated gradiens in atomic units, if present.
@@ -271,6 +271,10 @@ contains
         & r2r4, this%r0ab, rcov, s6, s18, rs6, rs8, rs10, alp6, alp8, alp10, &
         & this%noabc, this%numgrad, this%version, grads, disp2, gnorm, &
         & stress, latvecs, rep_vdw, rep_cn, this%rthr, .false., this%cn_thr)
+    ! Note, the stress variable in pbcgdisp contains the *lattice derivatives*
+    ! on return, so it needs to be converted to obtain the stress tensor.
+    stress(:,:) = -matmul(stress, transpose(latvecs))&
+        & / abs(determinant(latvecs))
     
   end subroutine dftd3_pbc_dispersion
 
