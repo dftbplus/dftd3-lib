@@ -4,7 +4,8 @@ ARCH = x86_64-linux-gnu
 ifeq ($(ARCH),x86_64-linux-gnu)
 FC = gfortran
 LN = gfortran
-FCFLAGS =
+FCFLAGS = -g -Wall -pedantic -fbounds-check -std=gnu
+FCFLAGS = 
 LNFLAGS =
 endif
 

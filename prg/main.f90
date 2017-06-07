@@ -70,7 +70,7 @@ program dftd3_main
   ! energies
   real(wp) e6, e8, e10, e12, disp, e6abc
   ! THE PARAMETERS OF THE METHOD (not all a "free")
-  real(wp) rs6, rs8, rs10, s6, s18, alp6, alp8, alp10, s42, rs18, alp
+  real(wp) rs6, rs8, s6, s18, alp6, alp8, rs18, alp
   ! printout option
   logical echo
   ! grad ?
@@ -93,10 +93,10 @@ program dftd3_main
   real(wp) cn_thr
   ! Integer for assigning only max/min cn C6 (0=normal, 1=min, 2=max)
   ! local and dummy variables
-  character*80 atmp,btmp,ctmp,dtmp,etmp,ftmp,func
-  integer i,j,k,z,nn,iat,jat,i1,i2
+  character(80) atmp,btmp,dtmp,etmp,ftmp,func
+  integer i,j,k,z,nn,iat,jat
   integer ida(max_elem),ipot
-  real(wp) x,y,dispr,displ,gdsp,dum,xx(10),dum6(86)
+  real(wp) x,dispr,displ,gdsp,dum,xx(10),dum6(86)
   real(wp) dum1,dum2,dum3(3)
   logical ex,pot,fdum
   logical minc6list(max_elem),maxc6list(max_elem),minc6,maxc6
@@ -265,7 +265,7 @@ program dftd3_main
   end do
   ! C6 hard-coded (c6ab.dat not used)
   ! this is alternative to loadc6
-  call copyc6(btmp,maxc,max_elem,c6ab,mxc, &
+  call copyc6(maxc,max_elem,c6ab,mxc, &
       & minc6,minc6list,maxc6,maxc6list)
   cn_thr=rthr2
 
@@ -448,10 +448,8 @@ program dftd3_main
   ! k3 in subroutine getc6, k1 and k2 in subroutine ncoord*
   ! fixed or dependent ones:
   rs8 = rs18
-  rs10 = rs18
   alp6 = alp
   alp8 = alp+2.
-  alp10= alp8+2.
   ! note: if version=4 (Becke-Johnson), a1=rs6 and a2=rs18
   ! and alp* have no meaning
 
@@ -479,11 +477,11 @@ program dftd3_main
     xyz(3,2)=1.0/autoang
 142 if (pbc) then
       call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-          & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+          & rcov,rs6,rs8,alp6,alp8,version,noabc, &
           & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
     else
       call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-          & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+          & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
           & e6,e8,e10,e12,e6abc)
     end if
     xyz(3,2)=xyz(3,2)+0.02
@@ -539,12 +537,12 @@ program dftd3_main
   !ccccccccccccc
   if (pbc) then
     call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-        & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+        & rs6,rs8,alp6,alp8,version,noabc, &
         & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
 
   else
     call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-        & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+        & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
         & e6,e8,e10,e12,e6abc)
   end if
 
@@ -642,11 +640,11 @@ program dftd3_main
     if (pbc) then
 
       call pbcadisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-          & rs6,rs8,rs10,alp6,alp8,alp10,version,autokcal,autoang, &
+          & rs6,rs8,alp6,alp8,version,autokcal,autoang, &
           & rthr,rep_vdw,cn_thr,rep_cn,s6,s18,disp*autokcal,lat)
     else
       call adisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-          & rs6,rs8,rs10,alp6,alp8,alp10,version,autokcal, &
+          & rs6,rs8,alp6,alp8,version,autokcal, &
           & autoang,rthr,cn_thr,s6,s18,disp*autokcal)
       !pbc
     end if
@@ -661,13 +659,13 @@ program dftd3_main
     call cpu_time(dum1)
     if (pbc) then
       call pbcgdisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-          & rcov,s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,numgrad,&
+          & rcov,s6,s18,rs6,rs8,alp6,alp8,noabc,numgrad,&
           & version,g,gdsp,x,g_lat,lat,rep_vdw,rep_cn, &
           & rthr,echo,cn_thr)
 
     else
       call gdisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-          & s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,rthr, &
+          & s6,s18,rs6,rs8,alp6,alp8,noabc,rthr, &
           & numgrad,version,echo,g,gdsp,x,rthr2,fix)
     end if
     call cpu_time(dum2)
@@ -717,11 +715,11 @@ program dftd3_main
   ! gradient test 6-7 digits should be the same
   if (pbc) then
     call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-        & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+        & rcov,rs6,rs8,alp6,alp8,version,noabc, &
         & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
   else
     call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-        & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+        & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
         & e6,e8,e10,e12,e6abc)
   end if
 
@@ -730,11 +728,11 @@ program dftd3_main
       xyz(j,i)=xyz(j,i)+0.00001
       if (pbc) then
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-            & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+            & rcov,rs6,rs8,alp6,alp8,version,noabc, &
             & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
       else
         call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-            & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+            & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
             & e6,e8,e10,e12,e6abc)
       end if
       e6 = e6 *s6
@@ -743,11 +741,11 @@ program dftd3_main
       xyz(j,i)=xyz(j,i)-0.00002
       if (pbc) then
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-            & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+            & rcov,rs6,rs8,alp6,alp8,version,noabc, &
             & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
       else
         call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-            & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+            & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
             & e6,e8,e10,e12,e6abc)
       end if
       e6 = e6 *s6
@@ -771,7 +769,7 @@ program dftd3_main
         call abc_to_xyz(abc,xyz,lat,n)
         !call edisp...dum1
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-            & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+            & rcov,rs6,rs8,alp6,alp8,version,noabc, &
             & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
 
         dispr=-s6*e6-s18*e8-e6abc
@@ -781,7 +779,7 @@ program dftd3_main
         call abc_to_xyz(abc,xyz,lat,n)
         !call edisp...dum2
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
-            & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc, &
+            & rcov,rs6,rs8,alp6,alp8,version,noabc, &
             & e6,e8,e10,e12,e6abc,lat,rthr,rep_vdw,cn_thr,rep_cn)
 
         displ=-s6*e6-s18*e8-e6abc

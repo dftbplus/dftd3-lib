@@ -70,8 +70,8 @@ contains
   subroutine rdpar(dtmp,version,s6,s18,rs6,rs18,alp)
     real(wp) s6,s18,rs6,rs18,alp
     integer version
-    character*(*) dtmp
-    character*80 ftmp,homedir
+    character(*) dtmp
+    character(80) ftmp,homedir
     logical ex
     real(wp) xx(10)
     integer nn
@@ -131,26 +131,26 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine adisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-      & rs6,rs8,rs10,alp6,alp8,alp10,version,autokcal, &
+      & rs6,rs8,alp6,alp8,version,autokcal, &
       & autoang,rthr,cn_thr,s6,s18,etot)
     integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*),s6
-    real(wp) rs6,rs8,rs10,alp6,alp8,alp10,autokcal,etot,s18,autoang
+    real(wp) rs6,rs8,alp6,alp8,autokcal,etot,s18,autoang
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3),rcov(max_elem)
 
     integer iat,jat,i,j,k,nbin
-    real(wp) R0,r,r2,r6,r8,tmp,alp,dx,dy,dz,c6,c8,c10
-    real(wp) damp6,damp8,damp10,r42,rr,check,rthr,cn_thr,rvdw
-    real(wp) cn(n),i6,e6,e8,e10,edisp
+    real(wp) R0,r,r2,r6,r8,tmp,dx,dy,dz,c6,c8
+    real(wp) damp6,damp8,r42,rr,check,rthr,cn_thr,rvdw
+    real(wp) cn(n),e6,e8,edisp
     real(wp) dist(0:15),li(0:15,2)
-    real(wp) xx(500),eg(10000)
+    real(wp) eg(10000)
     integer grplist(500,20)
     integer grpn(20),at(n)
     integer ngrp,dash
     integer iiii, jjjj, iii, jjj, ii, jj, ni, nj
     integer iout(500)
     logical ex
-    character*80 atmp
+    character(80) atmp
 
     real(wp),dimension(:,:), allocatable :: ed
     allocate(ed(n,n))
@@ -394,12 +394,11 @@ contains
   subroutine loadc6(fname,maxc,max_elem,c6ab,maxci)
     integer maxc,max_elem,maxci(max_elem)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
-    character*(*) fname
-    character*1 atmp
-    character*80 btmp
+    character(*) fname
+    character(80) btmp
 
-    real(wp) x,y,f,cn1,cn2,cmax,xx(10)
-    integer iat,jat,i,n,l,j,k,il,iadr,jadr,nn
+    real(wp) y,cn1,cn2
+    integer iat,jat,iadr,jadr
 
     c6ab=-1
     maxci=0
@@ -507,7 +506,7 @@ contains
   subroutine rdatpar(fname,max_elem,val)
     integer max_elem
     real(wp) val(max_elem)
-    character*(*) fname
+    character(*) fname
 
     integer i
     real(wp) dum1
@@ -541,7 +540,7 @@ contains
     real(wp) autoang
     integer max_elem
     real(wp) ab(max_elem,max_elem)
-    character*(*) fname
+    character(*) fname
 
     integer i,j
     real(wp) dum1
@@ -569,13 +568,13 @@ contains
   subroutine rdcoord(fname,n,xyz,iat,fix,fdum)
     real(wp) xyz(3,*)
     integer iat(*),n
-    character*(*) fname
+    character(*) fname
     !fix:array of fixed coordinates, fdum: whether
     logical fix(n),fdum
 
     real(wp) floats(3),f
-    character*80 line
-    character*80 strings(3)
+    character(80) line
+    character(80) strings(3)
     integer j,ich,cs,cf,ncheck
 
     f=0.0d0
@@ -640,11 +639,11 @@ contains
 
   subroutine rdatomnumber(fname,n)
     integer n
-    character*(*) fname
+    character(*) fname
 
     real(wp) floats(3),f
-    character*80 line
-    character*80 strings(3)
+    character(80) line
+    character(80) strings(3)
     integer j,ich,cs,cf
 
     f=0.0d0
@@ -699,7 +698,7 @@ contains
   subroutine outg(nat,g,fname)
     integer nat,i
     real(wp) g(3,nat)
-    character*(*) fname
+    character(*) fname
 
     open(unit=142,file=fname)
 
@@ -730,8 +729,8 @@ contains
     real(wp) xyz(3,*)
 
     integer i,j,nn,nl
-    character*128 a,a1
-    character*20 fname
+    character(128) a,a1
+    character(20) fname
     real(wp) xx(10),gsum,x,y,z
     real(wp), dimension(:,:), allocatable :: gr
     logical ex
@@ -856,8 +855,8 @@ contains
   function ESYM(I)
     INTEGER :: I
     
-    CHARACTER*2 ESYM
-    CHARACTER*2 ELEMNT(94)
+    CHARACTER(2) ESYM
+    CHARACTER(2) ELEMNT(94)
     DATA ELEMNT/'h ','he', &
         & 'li','be','b ','c ','n ','o ','f ','ne', &
         & 'na','mg','al','si','p ','s ','cl','ar', &
@@ -879,7 +878,7 @@ contains
   ! *****************************************************************
 
   subroutine READL(A1,X,N)
-    CHARACTER*(*) A1
+    CHARACTER(*) A1
     REAL(WP), DIMENSION(*) :: X
     INTEGER :: N
 
@@ -901,7 +900,7 @@ contains
   ! *****************************************************************
 
   function READAA(A,ISTART,IEND,IEND2)
-    CHARACTER*(*) A
+    CHARACTER(*) A
     INTEGER ISTART, IEND, IEND2
     REAL(WP) READAA
 
@@ -990,7 +989,6 @@ contains
       if (N.LE.NINE.AND.N.GE.IZERO) C1=C1*10.0D0+N-IZERO
       if (N.EQ.MINUS)ONE=-1.0D0
     end do
-61  CONTINUE
 70  READAA=READAA*10**(ONE*C1)
     RETURN
   end function READAA
@@ -998,7 +996,7 @@ contains
   subroutine prmat(iuout,r,n,m,head)
     integer :: iuout, n, m
     real(wp) r
-    character*(*) head
+    character(*) head
     dimension r(*)
 
     integer :: nkpb, ibl, ir, j1, k1s, kd, j2, i, k, k1, k2, kk, j, i1, i2, ij
@@ -1008,9 +1006,9 @@ contains
 
     write(iuout,1001) head
     nkpb=10
-    if (m)10,10,80
-    !
-10  continue
+    if (m > 0) then
+      goto 80
+    end if
     ibl=n/nkpb
     ir=n-ibl*nkpb
     j1=1
@@ -1073,7 +1071,7 @@ contains
       do j=1,n
         write(iuout,1003)j,(r(ij),ij=i1,i2,n)
         i1=i1+1
-90      i2=i1+(nkpb-1)*n
+        i2=i1+(nkpb-1)*n
       end do
     end do
 100 if (ir.eq.0) go to 120
@@ -1107,11 +1105,11 @@ contains
   !cccccccccccccccccccccccccccccccccccccccccccccc
 
   subroutine readfrag(line,iout,n)
-    character*80 line
-    character*12 str1,str2
+    character(80) line
+    character(12) str1,str2
     integer iout(500)
-    integer*4 n,i,j,k,sta,sto
-    character*11 nums
+    integer(4) n,i,k,sta,sto
+    character(11) nums
 
     ! write(*,*) 'In readfrag:'
     ! write(*,*) 'Line reads: ',line
@@ -1200,7 +1198,7 @@ contains
   subroutine checkrcov(n,iz,rcov,xyz)
     logical check
     integer iz(*),n,i,j
-    real(wp) rcov(94),dist,dx,dy,dz,thr,xyz(3,*),r
+    real(wp) rcov(94),dx,dy,dz,thr,xyz(3,*),r
     check=.false.
     do i=1,n-1
       do j=i+1,n
@@ -1227,12 +1225,12 @@ contains
   !reads a line cuts the at blanks and tabstops and returns all floats and
   subroutine readline(line,floats,strings,cs,cf)
     real(wp) floats(3)
-    character*80 line
-    character*80 strings(3)
+    character(80) line
+    character(80) strings(3)
 
     real(wp) num
-    character*80 stmp,str
-    character*1 digit
+    character(80) stmp,str
+    character(1) digit
     integer i,ty,cs,cf
 
     stmp=''
@@ -1279,11 +1277,11 @@ contains
 
   !this checks the type of the string and returns it cast to real or as st
   subroutine checktype(field,num,str,ty)
-    character*80 field,str,tstr
+    character(80) field,str
     real(wp) num
     integer ty
 
-    integer i,e
+    integer e
     logical is_num
 
     ty=99
@@ -1327,16 +1325,16 @@ contains
     real(wp), INTENT(OUT) ::lattice(3,3)
     integer, INTENT(out) :: iat(*)
     integer, INTENT(in) :: n
-    character*(*), INTENT(IN) :: fname
+    character(*), INTENT(IN) :: fname
     logical :: selective=.FALSE.
     logical :: cartesian=.TRUE.
     real(wp), INTENT(IN) ::autoang
 
     real(wp) xx(10),scalar
-    character*200 line
-    character*80 args(90),args2(90)
+    character(200) line
+    character(80) args(90)
 
-    integer i,j,ich,nn,ntype,ntype2,atnum,i_dummy1,i_dummy2,ncheck
+    integer i,j,ich,nn,ntype,i_dummy1,i_dummy2,ncheck
 
 
     lattice=0
@@ -1432,14 +1430,12 @@ contains
 
   subroutine pbcrdatomnumber(fname,n)
     integer, INTENT(out) :: n
-    character*(*), INTENT(IN) :: fname
-    logical :: selective=.FALSE.
-    logical :: cartesian=.TRUE.
+    character(*), INTENT(IN) :: fname
+    
+    real(wp) xx(10)
+    character(80) line,args(90)
 
-    real(wp) xx(10),scalar,fdum
-    character*80 line,args(90),args2(90)
-
-    integer i,j,ich,nn,ntype,ntype2,atnum,i_dummy1,i_dummy2
+    integer i,ich,nn,ntype,i_dummy1
 
     ich=142
     open(unit=ich,file=fname)
@@ -1464,16 +1460,8 @@ contains
       line=adjustl(line)
       call readl(line,xx,nn)
     end if
-    ! call elem(args(1),i_dummy2)
-    ! if (i_dummy2<1 .OR. i_dummy2>94) then
-    ! args=args2
-    ! end if
     if (nn.NE.ntype ) then
-      ! if (nn.NE.ntype2) then
       call stoprun( 'Error reading number of atomtypes')
-      ! ELSE
-      ! ntype=ntype2
-      ! end if
     end if
     n=0
     do i=1,nn
@@ -1494,7 +1482,7 @@ contains
   subroutine pbccheckrcov(n,iz,rcov,xyz,lat)
     logical check
     integer iz(*),n,i,j,taux,tauy,tauz
-    real(wp) rcov(94),dist,dx,dy,dz,thr,xyz(3,*),r,lat(3,3),tau(3)
+    real(wp) rcov(94),dx,dy,dz,thr,xyz(3,*),r,lat(3,3),tau(3)
     check=.false.
     do i=1,n-1
       do j=i+1,n
@@ -1562,28 +1550,28 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine pbcadisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-      & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,autokcal,&
+      & rcov,rs6,rs8,alp6,alp8,version,autokcal,&
       & autoang,rthr,rep_v,cn_thr,rep_cn,s6,s18,etot,lat)
     integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*),s6
-    real(wp) rs6,rs8,rs10,alp6,alp8,alp10,autokcal,etot,s18,autoang
+    real(wp) rs6,rs8,alp6,alp8,autokcal,etot,s18,autoang
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3),rcov(max_elem)
     real(wp) lat(3,3)
     integer rep_v(3),rep_cn(3)
 
     integer iat,jat,i,j,k,nbin,taux,tauy,tauz
-    real(wp) R0,r,r2,r6,r8,tmp,alp,dx,dy,dz,c6,c8,c10
-    real(wp) damp6,damp8,damp10,r42,rr,check,rthr,cn_thr,rvdw
-    real(wp) cn(n),i6,e6,e8,e10,edisp
+    real(wp) R0,r,r2,r6,r8,tmp,dx,dy,dz,c6,c8
+    real(wp) damp6,damp8,r42,rr,check,rthr,cn_thr,rvdw
+    real(wp) cn(n),e6,e8,edisp
     real(wp),allocatable :: dist(:),li(:,:)
-    real(wp) xx(500),eg(10000)
+    real(wp) eg(10000)
     integer grplist(500,20)
     integer grpn(20),at(n)
     integer ngrp,dash
     integer iiii, jjjj, iii, jjj, ii, jj, ni, nj
     integer iout(500)
     logical ex
-    character*80 atmp
+    character(80) atmp
     real(wp) tau(3)
 
     real(wp),dimension(:,:), allocatable :: ed

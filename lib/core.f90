@@ -199,10 +199,10 @@ contains
       case ("b2-plyp")
            rs6 =0.486434
            s18 =0.672820
-           rs18=3.656466                                                                                                                                              
-           s6  =0.640000                                                                                                                                              
-      case ("b3-lyp")                                                                                                                                                 
-           rs6 =0.278672                                                                                                                                              
+           rs18=3.656466
+           s6  =0.640000
+      case ("b3-lyp")
+           rs6 =0.278672
            s18 =1.466677
            rs18=4.606311
       case ("b97-d")
@@ -770,23 +770,23 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-      & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr,&
+      & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr,&
       & e6,e8,e10,e12,e63)
     integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
-    real(wp) rs6,rs8,rs10,alp6,alp8,alp10,rcov(max_elem)
+    real(wp) rs6,rs8,alp6,alp8,rcov(max_elem)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) e6, e8, e10, e12, e63
     logical noabc
 
     integer iat,jat,kat
-    real(wp) r,r2,r6,r8,tmp,alp,dx,dy,dz,c6,c8,c10,ang,rav
-    real(wp) damp6,damp8,damp10,rr,thr,c9,r42,c12,r10,c14,rthr,cn_thr
+    real(wp) r,r2,r6,r8,tmp,dx,dy,dz,c6,c8,ang,rav
+    real(wp) damp6,damp8,rr,c9,rthr,cn_thr
     real(wp) cn(n)
-    real(wp) r2ab(n*n),cc6ab(n*n),dmp(n*n),d2(3),t1,t2,t3,a1,a2,tmp2
+    real(wp) r2ab(n*n),cc6ab(n*n),dmp(n*n),t1,t2,t3,a1,a2,tmp2
     real(wp) abcthr
     integer(int64) icomp(n*n)
-    integer ij,ik,jk,k
+    integer ij,ik,jk
 
     e6 =0
     e8 =0
@@ -930,40 +930,35 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine gdisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-      & s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,rthr, &
+      & s6,s18,rs6,rs8,alp6,alp8,noabc,rthr, &
       & num,version,echo,g,disp,gnorm,cn_thr,fix)
 
     integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) g(3,*),s6,s18,rcov(max_elem)
-    real(wp) rs6,rs8,rs10,alp10,alp8,alp6,a1,a2
+    real(wp) rs6,rs8,alp8,alp6,a1,a2
     logical noabc,num,echo,fix(n)
 
-    integer iat,jat,i,j,kat,k
-    real(wp) R0,C6,alp,R42,disp,x1,y1,z1,x2,y2,z2,rr,e6abc
-    real(wp) dx,dy,dz,r2,r,r4,r6,r8,r10,r12,t6,t8,t10,damp1
-    real(wp) damp6,damp8,damp10,e6,e8,e10,e12,gnorm,tmp1
-    real(wp) s10,s8,gC6(3),term,step,dispr,displ,r235,tmp2
-    real(wp) cn(n),gx1,gy1,gz1,gx2,gy2,gz2,rthr,c8,cn_thr
-    real(wp) rthr3
+    integer iat,jat,i,j,kat
+    real(wp) R0,C6,R42,disp,x1,e6abc
+    real(wp) dx,dy,dz,r2,r,r4,r6,r8,t6,t8,damp1
+    real(wp) damp6,damp8,e6,e8,e10,e12,gnorm,tmp1
+    real(wp) s10,s8,step,dispr,displ,r235,tmp2
+    real(wp) cn(n),gx1,gy1,gz1,gx2,gy2,gz2,rthr,cn_thr
 
-    real(wp) rij(3),rik(3),rjk(3),r7,r9
-    real(wp) rik_dist,rjk_dist
+    real(wp) rij(3),r7,r9
     !d(E)/d(r_ij) derivative wrt. dist. iat-ja
     real(wp) drij(n*(n+1)/2)
-    real(wp) drik,drjk
     real(wp) rcovij
     !d(C6ij)/d(r_ij)
-    real(wp) dc6,c6chk
-    real(wp) expterm,dcni
+    real(wp) expterm
     !dCN(iat)/d(r_ij) is equal to
     real(wp) dcn
     !dCN(jat)/d(r_ij)
     ! saves (1/r^6*f_dmp + 3*r4r2/r^8*f_dmp) for kat l
     real(wp) dc6_rest
     integer linij,linik,linjk
-    real(wp) vec(3),vec2(3)
     ! dE_disp/dCN(iat) in dc6i(iat)
     real(wp) dc6i(n)
     ! saves dC6(ij)/dCN(iat)
@@ -979,7 +974,7 @@ contains
     real(wp) r3abc(n*(n+1)/2)
     real(wp) c9,rav,rav3,fdmp,ang,angr9,eabc,dc9,dfdmp,dang
     real(wp) r2ij,r2jk,r2ik,mijk,imjk,ijmk,rijk3
-    integer mat,linim,linjm,linkm,kk
+    integer kk
 
 
     dc6i=0.0d0
@@ -994,7 +989,7 @@ contains
       if (echo)write(*,*) 'doing numerical gradient O(N^3) ...'
 
       call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-          & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+          & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
           & e6,e8,e10,e12,e6abc)
       disp=-s6*e6-s18*e8-e6abc
 
@@ -1004,13 +999,13 @@ contains
         do j=1,3
           xyz(j,i)=xyz(j,i)+step
           call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-              & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+              & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
               & e6,e8,e10,e12,e6abc)
           dispr=-s6*e6-s18*e8-e6abc
           rabc=e6abc
           xyz(j,i)=xyz(j,i)-2*step
           call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
-              & rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,rthr,cn_thr, &
+              & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
               & e6,e8,e10,e12,e6abc)
           displ=-s6*e6-s18*e8-e6abc
           labc=e6abc
@@ -1098,7 +1093,7 @@ contains
           ! dC6(iat,jat)/dCN(jat).
           !
           call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)), &
-              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),iat,jat, &
+              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat), &
               & c6,dc6iji,dc6ijj)
 
 
@@ -1115,14 +1110,14 @@ contains
             damp6 =1.d0/( 1.d0+6.d0*t6 )
             t8 = (r/(rs8*R0))**(-alp8)
             damp8 =1.d0/( 1.d0+6.d0*t8 )
-  
+
             tmp1=s6*6.d0*damp6*C6/r7
             tmp2=s8*6.d0*C6*r42*damp8/r9
             ! d(r^(-6))/d(r_ij)
             drij(linij)=drij(linij)-tmp1 &
                 & -4.d0*tmp2
-  
-  
+
+
             drij(linij)=drij(linij) &
                 & +tmp1*alp6*t6*damp6 &
                 & +3.d0*tmp2*alp8*t8*damp8
@@ -1133,16 +1128,16 @@ contains
             damp6 =1.d0/( 1.d0+6.d0*t6 )
             t8 = (r/R0+R0*rs8)**(-alp8)
             damp8 =1.d0/( 1.d0+6.d0*t8 )
-  
+
             tmp1=s6*6.d0*damp6*C6/r7
             tmp2=s8*6.d0*C6*r42*damp8/r9
             ! d(r^(-6))/d(r_ij)
-            drij(linij)=drij(linij)-tmp1 &  
+            drij(linij)=drij(linij)-tmp1 &
                 &  -4.d0*tmp2
-  
-  
+
+
             drij(linij)=drij(linij) &
-                & +tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) & 
+                & +tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) &
                 & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8)
             !d(f_dmp)/d(r_ij)
 
@@ -1213,7 +1208,7 @@ contains
           ! dC6(iat,jat)/dCN(jat).
           !
           call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)), &
-              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),iat,jat, &
+              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat), &
               & c6,dc6iji,dc6ijj)
 
 
@@ -1414,18 +1409,17 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
   !
   subroutine get_dC6_dCNij(maxc,max_elem,c6ab,mxci,mxcj,cni,cnj, &
-      & izi,izj,iat,jat,c6check,dc6i,dc6j)
+      & izi,izj,c6check,dc6i,dc6j)
 
     integer maxc,max_elem
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
-    !mxc(iz(iat))
     integer mxci,mxcj
     real(wp) cni,cnj,term
-    integer iat,jat,izi,izj
+    integer izi,izj
     real(wp) dc6i,dc6j,c6check
 
 
-    integer i,j,a,b
+    integer a,b
     real(wp) zaehler,nenner,dzaehler_i,dnenner_i,dzaehler_j,dnenner_j
     real(wp) expterm,cn_refi,cn_refj,c6ref,r
     real(wp) c6mem,r_save
@@ -1498,7 +1492,7 @@ contains
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     ! the exponential is sensitive to numerics
     ! when nci or ncj is much larger than cn1/cn2
-    real(wp) cn1,cn2,r,rsum,csum,tmp,tmp1
+    real(wp) cn1,cn2,r,rsum,csum,tmp1
     real(wp) r_save
 
     c6mem=-1.d+99
@@ -1539,8 +1533,8 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine ncoord(natoms,rcov,iz,xyz,cn,cn_thr)
-    integer iz(*),natoms,i,max_elem
-    real(wp) xyz(3,*),cn(*),rcov(94),input
+    integer iz(*),natoms,i
+    real(wp) xyz(3,*),cn(*),rcov(94)
     real(wp) cn_thr
 
     integer iat
@@ -2449,7 +2443,7 @@ contains
     integer,intent(in) :: natoms,iz(*)
     real(wp),intent(in) :: rcov(94)
 
-    integer i,max_elem,rep_cn(3)
+    integer i,rep_cn(3)
     real(wp) xyz(3,*),cn(*),lat(3,3)
 
     integer iat,taux,tauy,tauz
@@ -2495,31 +2489,28 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-      & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+      & rcov,rs6,rs8,alp6,alp8,version,noabc,&
       & e6,e8,e10,e12,e63,lat,rthr,rep_vdw,cn_thr,rep_cn)
     integer max_elem,maxc
     real(wp) r2r4(max_elem),rcov(max_elem)
-    real(wp) rs6,rs8,rs10,alp6,alp8,alp10
+    real(wp) rs6,rs8,alp6,alp8
     real(wp) rthr,cn_thr,crit_cn
     integer rep_vdw(3),rep_cn(3)
     integer n,iz(*),version,mxc(max_elem)
-    ! integer rep_v(3)=rep_vdw!,rep_cn(3)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),lat(3,3)
-    ! real(wp) rs6,rs8,rs10,alp6,alp8,alp10,rcov(max_elem)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) e6, e8, e10, e12, e63
     logical noabc
 
-    integer iat,jat,kat
-    real(wp) r,r2,r6,r8,tmp,dx,dy,dz,c6,c8,c10,ang,rav,R0
-    real(wp) damp6,damp8,damp10,rr,thr,c9,r42,c12,r10,c14
+    integer iat,jat
+    real(wp) r,r2,r6,r8,tmp,dx,dy,dz,c6,c8,R0
+    real(wp) damp6,damp8,rr,r42
     real(wp) cn(n),rxyz(3),dxyz(3)
-    real(wp) r2ab(n*n),cc6ab(n*n),dmp(n*n),d2(3),t1,t2,t3,tau(3)
-    integer ij,ik,jk
+    real(wp) cc6ab(n*n),tau(3)
+    integer ij
     integer taux,tauy,tauz,counter
     real(wp) a1,a2
     real(wp) bj_dmp6,bj_dmp8
-    real(wp) tmp1,tmp2
 
 
     e6 =0
@@ -2675,7 +2666,7 @@ contains
               R0=r0ab(iz(jat),iz(iat))
               rr=R0/r
 
-              ! damping 
+              ! damping
               if(version.eq.3)then
                 ! DFT-D3 zero-damp
                 tmp=rs6*rr
@@ -2820,18 +2811,18 @@ contains
   subroutine pbcthreebody(max_elem,xyz,lat,n,iz,repv,cnthr,cc6ab,&
       & r0ab,eabc)
     integer max_elem
-    INTEGER :: n,i,j,k,jtaux,jtauy,jtauz,iat,jat,kat
+    INTEGER :: n,jtaux,jtauy,jtauz,iat,jat,kat
     INTEGER :: ktaux,ktauy,ktauz,counter,ij,ik,jk,idum
-    REAL(WP) :: dx,dy,dz,rij2,rik2,rjk2,c9,rr0ij,rr0ik
-    REAL(WP) :: rr0jk,geomean,fdamp,rik,rjk,rij
+    REAL(WP) :: rij2,rik2,rjk2,c9,rr0ij,rr0ik
+    REAL(WP) :: rr0jk,geomean,fdamp
     REAL(WP) :: r0ij,r0ik,r0jk
     REAL(WP),INTENT(OUT)::eabc
-    REAL(WP) :: tmp,tmp1,tmp2,tmp3,tmp4,ang
+    REAL(WP) :: tmp1,tmp2,tmp3,tmp4,ang
 
     REAL(WP) ,DIMENSION(3,3),INTENT(IN)::lat
     REAL(WP) ,DIMENSION(3,*),INTENT(IN) :: xyz
     INTEGER,DIMENSION(*),INTENT(IN)::iz
-    REAL(WP),DIMENSION(3):: jtau,ktau,jxyz,kxyz,ijvec,ikvec,jkvec,dumvec
+    REAL(WP),DIMENSION(3):: jtau,ktau,ijvec,ikvec,jkvec,dumvec
     INTEGER,DIMENSION(3):: repv
     REAL(WP),INTENT(IN) ::cnthr
     REAL(WP),DIMENSION(n*n),INTENT(IN)::cc6ab
@@ -3150,7 +3141,7 @@ contains
   !CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
   subroutine pbcgdisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-      & rcov,s6,s18,rs6,rs8,rs10,alp6,alp8,alp10,noabc,num,&
+      & rcov,s6,s18,rs6,rs8,alp6,alp8,noabc,num,&
       & version,g,disp,gnorm,stress,lat,rep_v,rep_cn,&
       & crit_vdw,echo,crit_cn)
 
@@ -3158,38 +3149,30 @@ contains
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) g(3,*),s6,s18,rcov(max_elem)
-    real(wp) rs6,rs8,rs10,alp10,alp8,alp6
+    real(wp) rs6,rs8,alp8,alp6
     real(wp) a1,a2
-    real(wp) bj_dmp6,bj_dmp8
     logical noabc,num,echo
     ! coversion factors
 
-    integer iat,jat,i,j,kat,my,ny,a,b,idum,tau2
-    real(wp) R0,C6,alp,R42,disp,x1,y1,z1,x2,y2,z2,rr,e6abc,fdum
-    real(wp) dx,dy,dz,r2,r,r4,r6,r8,r10,r12,t6,t8,t10,damp1
+    integer iat,jat,i,j,kat,my,ny,a,b,idum
+    real(wp) R0,C6,R42,disp,x1,e6abc
+    real(wp) r2,r,r4,r6,r8,t6,t8,damp1
     real(wp) damp6,damp8,damp9,e6,e8,e10,e12,gnorm,tmp1
-    real(wp) s10,s8,gC6(3),term,step,dispr,displ,r235,tmp2
-    real(wp) cn(n),gx1,gy1,gz1,gx2,gy2,gz2,rthr,testsum
+    real(wp) s10,s8,term,step,dispr,displ,r235,tmp2
+    real(wp) cn(n),rthr
     real(wp), DIMENSION(3,3) :: lat,stress,sigma,virialstress,lat_1
-    real(wp), DIMENSION(3,3) :: gC6_stress
     integer, DIMENSION(3) :: rep_v,rep_cn
     real(wp) crit_vdw,crit_cn
     integer taux,tauy,tauz
-    real(wp), DIMENSION(3) :: tau,vec12,dxyz,dxyz0
-    real(wp) ::outpr(3,3)
-    real(wp), DIMENSION(3,3):: outerprod
+    real(wp), DIMENSION(3) :: tau,dxyz
 
-    real(wp) rij(3),rik(3),rjk(3),r7,r9
-    real(wp) rik_dist,rjk_dist
-    real(wp) drik,drjk
+    real(wp) rij(3),r7,r9
     real(wp) rcovij
-    real(wp) dc6,c6chk
-    real(wp) expterm,dcni
+    real(wp) expterm
     real(wp), allocatable,dimension(:,:,:,:) :: drij
-    real(wp), allocatable,dimension(:,:,:,:) :: dcn
     real(wp) dcnn
     real(wp) :: dc6_rest
-    real(wp) vec(3),vec2(3),dummy
+    real(wp) vec(3),vec2(3)
     real(wp) dc6i(n)
     real(wp) dc6ij(n,n)
     real(wp) dc6_rest_sum(n*(n+1)/2)
@@ -3201,16 +3184,14 @@ contains
     real(wp) sigma_abc(3,3)
     real(wp) labc,rabc
     real(wp) ,dimension(3) ::ijvec,ikvec,jkvec,jtau,ktau,dumvec
-    integer jtaux,jtauy,jtauz,ktaux,ktauy,ktauz,mtaux,mtauy,mtauz
-    integer,dimension(3) :: taumin,taumax
-    integer mat,linim,linjm,linkm
+    integer jtaux,jtauy,jtauz,ktaux,ktauy,ktauz
     real(wp) rij2,rik2,rjk2,c9,c6ij,c6ik,c6jk,geomean,geomean3
     real(wp) rr0ij,rr0jk,rr0ik,dc6iji,dc6ijj
     real(wp) :: sr9=0.75d0
     real(wp), parameter :: alp9=-16.0d0
     real(wp),DIMENSION(n*(n+1)) ::c6save
     real(wp) abcthr,time1,time2,geomean2,r0av,dc9,dfdmp,dang,ang
-    integer,dimension(3) ::repv,repmin,repmax,repmin2,repmax2
+    integer,dimension(3) ::repv,repmin,repmax
 
     ! R^2 cut-off
     rthr=crit_vdw
@@ -3231,7 +3212,7 @@ contains
           & write(*,*) 'doing numerical gradient O(N^3) ...'
 
       call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-          & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+          & rcov,rs6,rs8,alp6,alp8,version,noabc,&
           & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
 
@@ -3243,14 +3224,14 @@ contains
         do j=1,3
           xyz(j,i)=xyz(j,i)+step
           call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-              & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+              & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
           dispr=-s6*e6-s18*e8-e6abc
           rabc=e6abc
           xyz(j,i)=xyz(j,i)-2*step
           call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-              & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+              & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
           displ=-s6*e6-s18*e8-e6abc
@@ -3270,7 +3251,7 @@ contains
           lat(j,i)=lat(j,i)+step
           call abc_to_xyz(abc,xyz,lat,n)
           call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-              & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+              & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
           dispr=-s6*e6-s18*e8-e6abc
@@ -3280,7 +3261,7 @@ contains
           lat(j,i)=lat(j,i)-2*step
           call abc_to_xyz(abc,xyz,lat,n)
           call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
-              & rcov,rs6,rs8,rs10,alp6,alp8,alp10,version,noabc,&
+              & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
           displ=-s6*e6-s18*e8-e6abc
@@ -3425,7 +3406,7 @@ contains
 
       do iat=1,n
         call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)),&
-            & mxc(iz(iat)),cn(iat),cn(iat),iz(iat),iz(iat),iat,iat,&
+            & mxc(iz(iat)),cn(iat),cn(iat),iz(iat),iz(iat),&
             & c6,dc6iji,dc6ijj)
 
         c6save(lin(iat,iat))=c6
@@ -3478,13 +3459,13 @@ contains
                   damp6 =1.d0/( 1.d0+6.d0*t6 )
                   t8 = (r/(R0)+R0*rs8)**(-alp8)
                   damp8 =1.d0/( 1.d0+6.d0*t8 )
-  
+
                   tmp1=s6*6.d0*damp6*C6/r7
                   tmp2=s8*6.d0*C6*r42*damp8/r9
                   drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat, &
                       & iat)) - (tmp1 +4.d0*tmp2)*0.5d0               ! d(r^(-6))/d(r_ij)
-  
-  
+
+
                   drij(tauz,tauy,taux,lin(iat,iat))=drij(tauz,tauy,taux,lin(iat, &
                       & iat)) +(tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) &
                       & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8))*0.5d0  !d(f_dmp)/d(r_ij)
@@ -3521,7 +3502,7 @@ contains
           ! dC6(iat,jat)/dCN(jat). these are saved in dC6ij for the kat loop
           !
           call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)),&
-              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),iat,jat,&
+              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),&
               & c6,dc6iji,dc6ijj)
 
           r0=r0ab(iz(jat),iz(iat))
@@ -3571,15 +3552,15 @@ contains
                   damp6 =1.d0/( 1.d0+6.d0*t6 )
                   t8 = (r/(R0)+R0*rs8)**(-alp8)
                   damp8 =1.d0/( 1.d0+6.d0*t8 )
-  
+
                   tmp1=s6*6.d0*damp6*C6/r7
                   tmp2=s8*6.d0*C6*r42*damp8/r9
                   drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux, &
                       & linij) - (tmp1 +4.d0*tmp2)  ! d(r^(-6))/d(r_ij)
-  
-  
+
+
                   drij(tauz,tauy,taux,linij)=drij(tauz,tauy,taux,linij) &
-                      & +(tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) & 
+                      & +(tmp1*alp6*t6*damp6*r/(r+rs6*R0*R0*rs8) &
                       & +3.d0*tmp2*alp8*t8*damp8*r/(r+R0*R0*rs8)) !d(f_dmp)/d(r_ij)
                 endif
                 !
@@ -3633,7 +3614,7 @@ contains
 
       do iat=1,n
         call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)),&
-            & mxc(iz(iat)),cn(iat),cn(iat),iz(iat),iz(iat),iat,iat,&
+            & mxc(iz(iat)),cn(iat),cn(iat),iz(iat),iz(iat),&
             & c6,dc6iji,dc6ijj)
 
         dc6ij(iat,iat)=dc6iji
@@ -3711,7 +3692,7 @@ contains
           ! dC6(iat,jat)/dCN(jat). these are saved in dC6ij for the kat loop
           !
           call get_dC6_dCNij(maxc,max_elem,c6ab,mxc(iz(iat)),&
-              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),iat,jat,&
+              & mxc(iz(jat)),cn(iat),cn(jat),iz(iat),iz(jat),&
               & c6,dc6iji,dc6ijj)
 
           r42=r2r4(iz(iat))*r2r4(iz(jat))
@@ -4540,8 +4521,6 @@ contains
       ! write(*,*)'gdisp:',disp
     end if
 
-451 continue
-
     sigma_abc=0.0d0
     sigma=0.0d0
 
@@ -4671,17 +4650,13 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine copyc6(fname,maxc,max_elem,c6ab,maxci, minc6,minc6list,maxc6,&
+  subroutine copyc6(maxc,max_elem,c6ab,maxci, minc6,minc6list,maxc6,&
       & maxc6list)
-    integer maxc,max_elem,maxci(max_elem),mima
+    integer maxc,max_elem,maxci(max_elem)
     real(wp)  c6ab(max_elem,max_elem,maxc,maxc,3)
-    character*(*) fname
     logical minc6,maxc6,minc6list(max_elem),maxc6list(max_elem)
 
-    character*1  atmp
-    character*80 btmp
-    real(wp)  x,y,f,cn1,cn2,cmax,xx(10)
-    integer iat,jat,i,n,l,j,k,il,iadr,jadr,nn,kk
+    integer iat,jat,i,iadr,jadr,nn,kk
     logical special
 
     call init_pars()
@@ -4964,14 +4939,13 @@ contains
     det = aa(1,1) * (aa(2,2) * aa(3,3) - aa(3,2) * aa(2,3))&
         & - aa(1,2) * (aa(2,1) * aa(3,3) - aa(3,1) * aa(2,3))&
         & + aa(1,3) * (aa(2,1) * aa(3,2) - aa(3,1) * aa(2,2))
-    
+
   end function determinant
 
 
   subroutine inv_cell(x,a)
     real(wp), intent(in) :: x(3,3)
     real(wp), intent(out) :: a(3,3)
-    integer i
     real(wp) det
 
     a = 0.0
