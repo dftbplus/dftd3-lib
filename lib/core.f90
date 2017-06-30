@@ -2443,6 +2443,7 @@ contains
   subroutine pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
       & rcov,rs6,rs8,alp6,alp8,version,noabc,&
       & e6,e8,e10,e12,e63,lat,rthr,rep_vdw,cn_thr,rep_cn)
+    integer(wp), intent(in) :: xyz(:,:)
     integer max_elem,maxc
     real(wp) r2r4(max_elem),rcov(max_elem)
     real(wp) rs6,rs8,alp6,alp8
@@ -2450,7 +2451,7 @@ contains
     integer rep_vdw(3),rep_cn(3)
     integer, intent(in) :: iz(:)
     integer n,version,mxc(max_elem)
-    real(wp) xyz(3,*),r0ab(max_elem,max_elem),lat(3,3)
+    real(wp) r0ab(max_elem,max_elem),lat(3,3)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) e6, e8, e10, e12, e63
     logical noabc
@@ -3076,8 +3077,9 @@ contains
       & version,g,disp,gnorm,stress,lat,rep_v,rep_cn,&
       & crit_vdw,echo,crit_cn)
     integer, intent(in) :: iz(:)
+    real(wp), intent(inout) :: xyz(:,:)
     integer n,max_elem,maxc,version,mxc(max_elem)
-    real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
+    real(wp) r0ab(max_elem,max_elem),r2r4(*)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) g(3,*),s6,s18,rcov(max_elem)
     real(wp) rs6,rs8,alp8,alp6
@@ -4801,9 +4803,9 @@ contains
 
   subroutine xyz_to_abc(xyz,abc,lat,n)
     integer,intent(in) :: n
-    real(wp), intent(in) :: xyz(3,n)
+    real(wp), intent(in) :: xyz(:,:)
     real(wp), intent(in) :: lat(3,3)
-    real(wp), intent(out) :: abc(3,n)
+    real(wp), intent(out) :: abc(:,:)
 
     real(wp) lat_1(3,3)
 
@@ -4816,8 +4818,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine abc_to_xyz(abc,xyz,lat,n)
-    real(wp), intent(in) :: abc(3,n)
-    real(wp), intent(out) :: xyz(3,n)
+    real(wp), intent(in) :: abc(:,:)
+    real(wp), intent(out) :: xyz(:,:)
     real(wp), intent(in) :: lat(3,3)
     integer,intent(in) :: n
 

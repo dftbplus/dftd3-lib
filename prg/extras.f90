@@ -133,7 +133,8 @@ contains
   subroutine adisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
       & rs6,rs8,alp6,alp8,version,autokcal, &
       & autoang,rthr,cn_thr,s6,s18,etot)
-    integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
+    integer, intent(in) :: iz(:)
+    integer n,max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*),s6
     real(wp) rs6,rs8,alp6,alp8,autokcal,etot,s18,autoang
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3),rcov(max_elem)
@@ -1169,8 +1170,8 @@ contains
 
   ! Input Geometry sanity check via CNs, not used
   subroutine checkcn(n,iz,cn,c6ab,max_elem,maxc)
-
-    integer iz(*),i,n
+    integer, intent(in) :: iz(:)
+    integer i,n
     logical check
     real(wp) cn(*),maxcn
     integer max_elem,maxc
@@ -1196,8 +1197,9 @@ contains
 
   ! Input Geometry sanity check (to avoid au/Angtstrom mixups) S.E. 16
   subroutine checkrcov(n,iz,rcov,xyz)
+    integer, intent(in) :: iz(:)
     logical check
-    integer iz(*),n,i,j
+    integer n,i,j
     real(wp) rcov(94),dx,dy,dz,thr,xyz(3,*),r
     check=.false.
     do i=1,n-1
@@ -1480,8 +1482,9 @@ contains
 
   ! Input Geometry sanity check for pbc (to avoid au/Angtstrom mixups)
   subroutine pbccheckrcov(n,iz,rcov,xyz,lat)
+    integer, intent(in) :: iz(:)
     logical check
-    integer iz(*),n,i,j,taux,tauy,tauz
+    integer n,i,j,taux,tauy,tauz
     real(wp) rcov(94),dx,dy,dz,thr,xyz(3,*),r,lat(3,3),tau(3)
     check=.false.
     do i=1,n-1
@@ -1552,7 +1555,8 @@ contains
   subroutine pbcadisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
       & rcov,rs6,rs8,alp6,alp8,version,autokcal,&
       & autoang,rthr,rep_v,cn_thr,rep_cn,s6,s18,etot,lat)
-    integer n,iz(*),max_elem,maxc,version,mxc(max_elem)
+    integer, intent(in) :: iz(:)
+    integer n,max_elem,maxc,version,mxc(max_elem)
     real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*),s6
     real(wp) rs6,rs8,alp6,alp8,autokcal,etot,s18,autoang
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3),rcov(max_elem)
