@@ -135,7 +135,8 @@ contains
       & autoang,rthr,cn_thr,s6,s18,etot)
     integer, intent(in) :: iz(:)
     integer n,max_elem,maxc,version,mxc(max_elem)
-    real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*),s6
+    real(wp), intent(in) :: xyz(:,:)
+    real(wp) r0ab(max_elem,max_elem),r2r4(*),s6
     real(wp) rs6,rs8,alp6,alp8,autokcal,etot,s18,autoang
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3),rcov(max_elem)
 

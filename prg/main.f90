@@ -760,13 +760,13 @@ program dftd3_main
     if (echo) write(*,*)'Doing numerical stresstensor...'
     allocate(abc(3,n))
 
-    call xyz_to_abc(xyz,abc,lat,n)
+    call xyz_to_abc(xyz,abc,lat)
     dum1=1.d-5
     if (echo) write(*,*)'step: ',dum1
     do i=1,3
       do j=1,3
         lat(j,i)=lat(j,i)+dum1
-        call abc_to_xyz(abc,xyz,lat,n)
+        call abc_to_xyz(abc,xyz,lat)
         !call edisp...dum1
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
             & rcov,rs6,rs8,alp6,alp8,version,noabc, &
@@ -776,7 +776,7 @@ program dftd3_main
 
 
         lat(j,i)=lat(j,i)-2*dum1
-        call abc_to_xyz(abc,xyz,lat,n)
+        call abc_to_xyz(abc,xyz,lat)
         !call edisp...dum2
         call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab, &
             & rcov,rs6,rs8,alp6,alp8,version,noabc, &
@@ -786,7 +786,7 @@ program dftd3_main
         dum=(dispr-displ)/(dum1*2.0)
 
         lat(j,i)=lat(j,i)+dum1
-        call abc_to_xyz(abc,xyz,lat,n)
+        call abc_to_xyz(abc,xyz,lat)
 
         write(*,'("L",2i1,2E14.6)') i,j,dum,g_lat(j,i)
         !j

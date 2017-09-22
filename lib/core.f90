@@ -767,7 +767,8 @@ contains
       & e6,e8,e10,e12,e63)
     integer, intent(in) :: iz(:),max_elem
     integer n,maxc,version,mxc(max_elem)
-    real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
+    real(wp), intent(in) :: xyz(:,:)
+    real(wp) r0ab(max_elem,max_elem),r2r4(*)
     real(wp) rs6,rs8,alp6,alp8,rcov(max_elem)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) e6, e8, e10, e12, e63
@@ -927,7 +928,8 @@ contains
 
     integer, intent(in) :: iz(:),max_elem
     integer n,maxc,version,mxc(max_elem)
-    real(wp) xyz(3,*),r0ab(max_elem,max_elem),r2r4(*)
+    real(wp) r0ab(max_elem,max_elem),r2r4(*)
+    real(wp), intent(in) :: xyz(:,:)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
     real(wp) g(3,*),s6,s18,rcov(max_elem)
     real(wp) rs6,rs8,alp8,alp6,a1,a2
@@ -969,10 +971,14 @@ contains
     real(wp) r2ij,r2jk,r2ik,mijk,imjk,ijmk,rijk3
     integer kk
 
+    real(wp) :: xyzTmp(3,size(xyz,dim=2))
+    
     dc6i=0.0d0
     abccalc=.FALSE.
     abcthr=cn_thr
 
+    xyzTmp = xyz
+    
     !NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
     if (num) then
       if (echo)write(*,*) 'doing numerical gradient O(N^3) ...'
@@ -986,20 +992,20 @@ contains
 
       do i=1,n
         do j=1,3
-          xyz(j,i)=xyz(j,i)+step
-          call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
+          xyzTmp(j,i)=xyz(j,i)+step
+          call edisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,rcov, &
               & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
               & e6,e8,e10,e12,e6abc)
           dispr=-s6*e6-s18*e8-e6abc
           rabc=e6abc
-          xyz(j,i)=xyz(j,i)-2*step
-          call edisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,rcov, &
+          xyzTmp(j,i)=xyz(j,i)-step
+          call edisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,rcov, &
               & rs6,rs8,alp6,alp8,version,noabc,rthr,cn_thr, &
               & e6,e8,e10,e12,e6abc)
           displ=-s6*e6-s18*e8-e6abc
           labc=e6abc
           g(j,i)=0.5*(dispr-displ)/step
-          xyz(j,i)=xyz(j,i)+step
+          xyzTmp(j,i)=xyz(j,i)
         end do
       end do
       goto 999
@@ -1491,10 +1497,11 @@ contains
 
   subroutine ncoord(natoms,rcov,iz,xyz,cn,cn_thr)
     integer, intent(in) :: iz(:),natoms
-    integer :: i
-    real(wp) xyz(3,*),cn(*),rcov(94)
-    real(wp) cn_thr
+    real(wp), intent(out) :: cn(:)
+    real(wp), intent(in) :: rcov(94), xyz(:,:)
+    real(wp), intent(in) :: cn_thr
 
+    integer :: i
     integer iat
     real(wp) dx,dy,dz,r,damp,xn,rr,rco,r2
 
@@ -2355,7 +2362,7 @@ contains
         & 'cs','ba','la','ce','pr','nd','pm','sm','eu','gd','tb','dy', &
         & 'ho','er','tm','yb','lu','hf','ta','w ','re','os','ir','pt', &
         & 'au','hg','tl','pb','bi','po','at','rn', &
-        & 'fr','ra','ac','th','pa','u ','np','pu' ]
+        & 'fr','ra','ac','th','pa','u ','np','pu']
 
     CHARACTER(2) :: E
     integer :: k, j, n, i
@@ -2443,7 +2450,7 @@ contains
   subroutine pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
       & rcov,rs6,rs8,alp6,alp8,version,noabc,&
       & e6,e8,e10,e12,e63,lat,rthr,rep_vdw,cn_thr,rep_cn)
-    integer(wp), intent(in) :: xyz(:,:)
+    real(wp), intent(in) :: xyz(:,:)
     integer max_elem,maxc
     real(wp) r2r4(max_elem),rcov(max_elem)
     real(wp) rs6,rs8,alp6,alp8
@@ -3077,7 +3084,7 @@ contains
       & version,g,disp,gnorm,stress,lat,rep_v,rep_cn,&
       & crit_vdw,echo,crit_cn)
     integer, intent(in) :: iz(:)
-    real(wp), intent(inout) :: xyz(:,:)
+    real(wp), intent(in) :: xyz(:,:)
     integer n,max_elem,maxc,version,mxc(max_elem)
     real(wp) r0ab(max_elem,max_elem),r2r4(*)
     real(wp) c6ab(max_elem,max_elem,maxc,maxc,3)
@@ -3126,6 +3133,8 @@ contains
     real(wp) abcthr,time1,time2,geomean2,r0av,dc9,dfdmp,dang,ang
     integer,dimension(3) ::repv,repmin,repmax
 
+    real(wp) :: xyzTmp(3,size(xyz,dim=2))
+    
     ! R^2 cut-off
     rthr=crit_vdw
     abcthr=crit_cn
@@ -3135,7 +3144,7 @@ contains
     stress=0.0d0
     gabc=0.0d0
     glatabc=0.0d0
-
+    
     ! testsum=0.0d0
 
     if (echo)write(*,*)
@@ -3152,17 +3161,18 @@ contains
 
       step=2.d-5
 
+      xyzTmp = xyz
       do i=1,n
         do j=1,3
-          xyz(j,i)=xyz(j,i)+step
-          call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
+          xyzTmp(j,i)=xyz(j,i)+step
+          call pbcedisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,&
               & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
           dispr=-s6*e6-s18*e8-e6abc
           rabc=e6abc
-          xyz(j,i)=xyz(j,i)-2*step
-          call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
+          xyzTmp(j,i)=xyz(j,i)-step
+          call pbcedisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,&
               & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
@@ -3170,19 +3180,19 @@ contains
           labc=e6abc
           gabc(j,i)=0.5*(rabc-labc)/step
           g(j,i)=0.5*(dispr-displ)/step
-          xyz(j,i)=xyz(j,i)+step
+          xyzTmp(j,i)=xyz(j,i)
         end do
       end do
       if (echo) write(*,*)'Doing numerical stresstensor...'
 
-      call xyz_to_abc(xyz,abc,lat,n)
+      call xyz_to_abc(xyz,abc,lat)
       step=2.d-5
       if (echo) write(*,*)'step: ',step
       do i=1,3
         do j=1,3
           lat(j,i)=lat(j,i)+step
-          call abc_to_xyz(abc,xyz,lat,n)
-          call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
+          call abc_to_xyz(abc,xyzTmp,lat)
+          call pbcedisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,&
               & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
@@ -3190,8 +3200,8 @@ contains
           labc=e6abc
 
           lat(j,i)=lat(j,i)-2*step
-          call abc_to_xyz(abc,xyz,lat,n)
-          call pbcedisp(max_elem,maxc,n,xyz,iz,c6ab,mxc,r2r4,r0ab,&
+          call abc_to_xyz(abc,xyzTmp,lat)
+          call pbcedisp(max_elem,maxc,n,xyzTmp,iz,c6ab,mxc,r2r4,r0ab,&
               & rcov,rs6,rs8,alp6,alp8,version,noabc,&
               & e6,e8,e10,e12,e6abc,lat,rthr,rep_v,crit_cn,rep_cn)
 
@@ -3199,9 +3209,6 @@ contains
           rabc=e6abc
           stress(j,i)=(dispr-displ)/(step*2.0)
           glatabc(j,i)=(rabc-labc)/(step*2.0d0)
-
-          lat(j,i)=lat(j,i)+step
-          call abc_to_xyz(abc,xyz,lat,n)
 
         end do
       end do
@@ -4801,8 +4808,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine xyz_to_abc(xyz,abc,lat,n)
-    integer,intent(in) :: n
+  subroutine xyz_to_abc(xyz,abc,lat)
     real(wp), intent(in) :: xyz(:,:)
     real(wp), intent(in) :: lat(3,3)
     real(wp), intent(out) :: abc(:,:)
@@ -4817,11 +4823,10 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine abc_to_xyz(abc,xyz,lat,n)
+  subroutine abc_to_xyz(abc,xyz,lat)
     real(wp), intent(in) :: abc(:,:)
     real(wp), intent(out) :: xyz(:,:)
     real(wp), intent(in) :: lat(3,3)
-    integer,intent(in) :: n
 
     xyz=matmul(lat,abc)
 
