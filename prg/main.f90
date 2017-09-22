@@ -562,7 +562,7 @@ program dftd3_main
   if (echo) then
 
     if(version.lt.4)then
-      write(*,'(/10x,'' DFT-D V'',i1)') version       
+      write(*,'(/10x,'' DFT-D V'',i1)') version
     elseif(version.eq.4)then
       write(*,'(/10x,'' DFT-D V3(BJ)'')')
     elseif(version.eq.5)then
@@ -570,27 +570,27 @@ program dftd3_main
     elseif(version.eq.6)then
       write(*,'(/10x,'' DFT-D V3 M(BJ)'')')
     endif
-    write(*,'('' DF '',a50)') func          
-    write(*,'('' parameters'')') 
+    write(*,'('' DF '',a50)') func
+    write(*,'('' parameters'')')
     if(version.eq.2)then
-      write(*,'('' s6       :'',f10.4)') s6            
-      write(*,'('' alpha6   :'',f10.4)') alp6        
+      write(*,'('' s6       :'',f10.4)') s6
+      write(*,'('' alpha6   :'',f10.4)') alp6
     end if
     if(version.eq.3)then
-      write(*,'('' s6       :'',f10.4)') s6            
-      write(*,'('' s8       :'',f10.4)') s18           
-      write(*,'('' rs6      :'',f10.4)') rs6  
-      write(*,'('' rs18     :'',f10.4)') rs18          
-      write(*,'('' alpha6   :'',f10.4)') alp6        
-      write(*,'('' alpha8   :'',f10.4)') alp8           
-      write(*,'('' k1-k3    :'',3f10.4)') k1,k2,k3     
+      write(*,'('' s6       :'',f10.4)') s6
+      write(*,'('' s8       :'',f10.4)') s18
+      write(*,'('' rs6      :'',f10.4)') rs6
+      write(*,'('' rs18     :'',f10.4)') rs18
+      write(*,'('' alpha6   :'',f10.4)') alp6
+      write(*,'('' alpha8   :'',f10.4)') alp8
+      write(*,'('' k1-k3    :'',3f10.4)') k1,k2,k3
     end if
     if((version.eq.4).or.(version.eq.6))then
-      write(*,'('' s6       :'',F10.4)') s6            
-      write(*,'('' s8       :'',F10.4)') s18           
-      write(*,'('' a1       :'',F10.4)') rs6           
-      write(*,'('' a2       :'',F10.4)') rs18          
-      write(*,'('' k1-k3    :'',3F10.4)') k1,k2,k3     
+      write(*,'('' s6       :'',F10.4)') s6
+      write(*,'('' s8       :'',F10.4)') s18
+      write(*,'('' a1       :'',F10.4)') rs6
+      write(*,'('' a2       :'',F10.4)') rs18
+      write(*,'('' k1-k3    :'',3F10.4)') k1,k2,k3
     end if
     if(version.eq.5)then
       write(*,'('' s6       :'',f10.4)') s6
@@ -615,13 +615,13 @@ program dftd3_main
     end if
     write(*,'(/'' E6    /kcal :'',f11.4)')-e6*autokcal
     if(version.gt.2)then
-      write(*,'('' E8    /kcal :'',f11.4)')-e8*autokcal 
-      !     write(*,'('' E10   /kcal :'',f11.4)')-e10*autokcal 
+      write(*,'('' E8    /kcal :'',f11.4)')-e8*autokcal
+      !     write(*,'('' E10   /kcal :'',f11.4)')-e10*autokcal
       if(.not.noabc) &
-          & write(*,'('' E6(ABC) "   :'',2f11.6,F16.12)')-e6abc*autokcal 
-      write(*,'('' % E8        :'',f6.2)') -e8/disp/0.01         
+          & write(*,'('' E6(ABC) "   :'',2f11.6,F16.12)')-e6abc*autokcal
+      write(*,'('' % E8        :'',f6.2)') -e8/disp/0.01
       if(.not.noabc) &
-          & write(*,'('' % E6(ABC)   :'',f6.2)') -e6abc/disp/0.01        
+          & write(*,'('' % E6(ABC)   :'',f6.2)') -e6abc/disp/0.01
     end if
   end if
   ! this file for tmer2 read tool

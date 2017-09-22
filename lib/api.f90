@@ -44,7 +44,7 @@ module dftd3_api
 
     !> C6 max flags (or unallocated if not needed)
     logical, allocatable :: maxc6list(:)
-    
+
     !> Real space cutoff in atomic units.
     real(wp) :: cutoff = sqrt(9000.0_wp)
 
@@ -101,7 +101,7 @@ contains
       maxc6list(:) = .false.
     end if
     maxc6 = any(maxc6list)
-    
+
     allocate(this%c6ab(max_elem, max_elem, maxc, maxc, 3))
     allocate(this%mxc(max_elem))
     call copyc6(maxc, max_elem, this%c6ab, this%mxc, minc6, minc6list, &
@@ -112,8 +112,8 @@ contains
     call setr0ab(max_elem, autoang, this%r0ab)
 
   end subroutine dftd3_init
-    
-    
+
+
   !> Sets the parameter for the dftd3 calculator by choosing a functional.
   !!
   !! \param func  Name of the functional.
@@ -129,13 +129,13 @@ contains
     this%version = version
     call setfuncpar(func, this%version, tz, this%s6, this%rs6, this%s18, &
         & this%rs18, this%alp)
-    
+
   end subroutine dftd3_set_functional
 
 
   !> Sets the parameter for the dftd3 calculator directly.
   !!
-  !! \param pars  Parameter to use. The 5 parameters must follow the same 
+  !! \param pars  Parameter to use. The 5 parameters must follow the same
   !!     order as when specified in the dftd3.local file for the dftd3 program.
   !!     (see the documentation of the dftd3 program for details)
   !! \param version  Version to use. Note, that depending on the version the
@@ -157,7 +157,7 @@ contains
     this%rs18 = pars(4)
     this%alp = pars(5)
     this%version = version
-    
+
   end subroutine dftd3_set_params
 
 
@@ -205,7 +205,7 @@ contains
         & this%r0ab, rcov, s6, s18, rs6, rs8, alp6, alp8, &
         & this%noabc, this%rthr, this%numgrad, this%version, .false., grads, &
         & gdsp, gnorm, this%cn_thr, fix)
-    
+
   end subroutine dftd3_dispersion
 
 
@@ -271,7 +271,7 @@ contains
     ! on return, so it needs to be converted to obtain the stress tensor.
     stress(:,:) = -matmul(stress, transpose(latvecs))&
         & / abs(determinant(latvecs))
-    
+
   end subroutine dftd3_pbc_dispersion
 
 
@@ -288,5 +288,5 @@ contains
 
   end function get_atomic_number
 
-  
+
 end module dftd3_api

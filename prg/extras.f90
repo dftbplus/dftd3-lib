@@ -856,7 +856,7 @@ contains
 
   function ESYM(I)
     INTEGER :: I
-    
+
     CHARACTER(2) ESYM
     CHARACTER(2) ELEMNT(94)
     DATA ELEMNT/'h ','he', &
@@ -909,7 +909,7 @@ contains
     INTEGER :: NINE, IZERO, MINUS, IdoT, ND, NE, IBL, IDIG, NL
     INTEGER :: I, II, J, N, M
     REAL(WP) :: C1, C2, ONE, X
-    
+
     NINE=ICHAR('9')
     IZERO=ICHAR('0')
     MINUS=ICHAR('-')
@@ -1434,7 +1434,7 @@ contains
   subroutine pbcrdatomnumber(fname,n)
     integer, INTENT(out) :: n
     character(*), INTENT(IN) :: fname
-    
+
     real(wp) xx(10)
     character(80) line,args(90)
 

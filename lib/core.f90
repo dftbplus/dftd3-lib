@@ -972,13 +972,13 @@ contains
     integer kk
 
     real(wp) :: xyzTmp(3,size(xyz,dim=2))
-    
+
     dc6i=0.0d0
     abccalc=.FALSE.
     abcthr=cn_thr
 
     xyzTmp = xyz
-    
+
     !NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
     if (num) then
       if (echo)write(*,*) 'doing numerical gradient O(N^3) ...'
@@ -3134,7 +3134,7 @@ contains
     integer,dimension(3) ::repv,repmin,repmax
 
     real(wp) :: xyzTmp(3,size(xyz,dim=2))
-    
+
     ! R^2 cut-off
     rthr=crit_vdw
     abcthr=crit_cn
@@ -3144,7 +3144,7 @@ contains
     stress=0.0d0
     gabc=0.0d0
     glatabc=0.0d0
-    
+
     ! testsum=0.0d0
 
     if (echo)write(*,*)
@@ -4710,7 +4710,7 @@ contains
         end if
         kk=(nn*5)+1
       end do
-      
+
       !no min/max at all
     else
       do nn=1,nlines
@@ -4738,7 +4738,7 @@ contains
   subroutine SET_CRITERIA(rthr,lat,tau_max)
     real(wp), intent(in) :: rthr
     real(wp), intent(in) :: lat(3,3)
-    real(wp), intent(out) :: tau_max(3)    
+    real(wp), intent(out) :: tau_max(3)
     real(wp) :: r_cutoff
     real(wp) :: norm1(3),norm2(3),norm3(3)
     real(wp) :: cos10,cos21,cos32

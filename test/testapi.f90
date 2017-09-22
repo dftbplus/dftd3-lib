@@ -28,7 +28,7 @@ program testapi
   real(wp), parameter :: AA__Bohr = 1.0_wp / 0.52917726_wp
 
   integer, parameter :: nAtoms = 60
-  
+
   ! Coordinates in Angstrom as found in dna.xyz/dna.poscar
   ! They must be converted to Bohr before passed to dftd3
   real(wp), parameter :: coords(3, nAtoms) = reshape([ &
@@ -93,7 +93,7 @@ program testapi
        &  1.3605600000E-01,   3.3969160000E+00,   9.1243960000E+00, &
        &  6.3723670000E+00,   3.3979410000E+00,   7.5470280000E+00 &
        &] * AA__Bohr, [3, nAtoms])
-  
+
   integer, parameter :: species(nAtoms) = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, &
      & 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, &
      & 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
@@ -108,7 +108,7 @@ program testapi
 
   integer, parameter :: nSpecies = 4
   character(2), parameter :: speciesNames(nSpecies) = [ 'N ', 'C ', 'O ', 'H ']
-  
+
 
   type(dftd3_input) :: input
   type(dftd3_calc) :: dftd3
@@ -122,7 +122,7 @@ program testapi
 
   ! You can set input variables if you like, or just leave them on their
   ! defaults, which are the same as the dftd3 program uses.
-  
+
   !! Threebody interactions (default: .false.)
   !input%threebody = .true.
   !
@@ -150,7 +150,7 @@ program testapi
   write(*, "(A)") "Gradients [au]:"
   write(*, "(3ES20.12)") grads
   write(*, *)
-  
+
   ! Calculate dispersion and gradients for periodic case
   call dftd3_pbc_dispersion(dftd3, coords, atnum, latVecs, edisp, grads, stress)
   write(*, "(A)") "*** Dispersion for periodic case"
