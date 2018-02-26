@@ -44,7 +44,7 @@ module dftd3_api
 
     !> C6 max flags (or unallocated if not needed)
     logical, allocatable :: maxc6list(:)
-    
+
     !> Real space cutoff in atomic units.
     real(wp) :: cutoff = sqrt(9000.0_wp)
 
@@ -101,10 +101,10 @@ contains
       maxc6list(:) = .false.
     end if
     maxc6 = any(maxc6list)
-    
+
     allocate(this%c6ab(max_elem, max_elem, maxc, maxc, 3))
     allocate(this%mxc(max_elem))
-    call copyc6("", maxc, max_elem, this%c6ab, this%mxc, minc6, minc6list, &
+    call copyc6(maxc, max_elem, this%c6ab, this%mxc, minc6, minc6list, &
         & maxc6, maxc6list)
     this%rthr = input%cutoff**2
     this%cn_thr = input%cutoff_cn**2
@@ -112,8 +112,8 @@ contains
     call setr0ab(max_elem, autoang, this%r0ab)
 
   end subroutine dftd3_init
-    
-    
+
+
   !> Sets the parameter for the dftd3 calculator by choosing a functional.
   !!
   !! \param func  Name of the functional.
@@ -129,13 +129,13 @@ contains
     this%version = version
     call setfuncpar(func, this%version, tz, this%s6, this%rs6, this%s18, &
         & this%rs18, this%alp)
-    
+
   end subroutine dftd3_set_functional
 
 
   !> Sets the parameter for the dftd3 calculator directly.
   !!
-  !! \param pars  Parameter to use. The 5 parameters must follow the same 
+  !! \param pars  Parameter to use. The 5 parameters must follow the same
   !!     order as when specified in the dftd3.local file for the dftd3 program.
   !!     (see the documentation of the dftd3 program for details)
   !! \param version  Version to use. Note, that depending on the version the
@@ -157,7 +157,7 @@ contains
     this%rs18 = pars(4)
     this%alp = pars(5)
     this%version = version
-    
+
   end subroutine dftd3_set_params
 
 
@@ -178,7 +178,7 @@ contains
 
     logical, allocatable :: fix(:)
     integer :: natom
-    real(wp) :: s6, s18, rs6, rs8, rs10, alp6, alp8, alp10
+    real(wp) :: s6, s18, rs6, rs8, alp6, alp8
     real(wp) :: e6, e8, e10, e12, e6abc, gdsp, gnorm
 
     natom = size(coords, dim=2)
@@ -186,12 +186,10 @@ contains
     s18 = this%s18
     rs6 = this%rs6
     rs8 = this%rs18
-    rs10 = this%rs18
     alp6 = this%alp
     alp8 = alp6 + 2.0_wp
-    alp10 = alp8 + 2.0_wp
     call edisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, &
-        & r2r4, this%r0ab, rcov, rs6, rs8, rs10, alp6, alp8, alp10, &
+        & r2r4, this%r0ab, rcov, rs6, rs8, alp6, alp8, &
         & this%version, this%noabc, this%rthr, this%cn_thr, e6, e8, e10, e12, &
         & e6abc)
     disp = -e6 * this%s6 - e8 * this%s18 - e6abc
@@ -204,10 +202,10 @@ contains
     fix(:) = .false.
     grads(:,:) = 0.0_wp
     call gdisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, r2r4, &
-        & this%r0ab, rcov, s6, s18, rs6, rs8, rs10, alp6, alp8, alp10, &
+        & this%r0ab, rcov, s6, s18, rs6, rs8, alp6, alp8, &
         & this%noabc, this%rthr, this%numgrad, this%version, .false., grads, &
         & gdsp, gnorm, this%cn_thr, fix)
-    
+
   end subroutine dftd3_dispersion
 
 
@@ -231,7 +229,7 @@ contains
     real(wp), optional, intent(out) :: grads(:,:), stress(:,:)
 
     integer :: natom
-    real(wp) :: s6, s18, rs6, rs8, rs10, alp6, alp8, alp10
+    real(wp) :: s6, s18, rs6, rs8, alp6, alp8
     real(wp) :: e6, e8, e10, e12, e6abc, gnorm, disp2
     real(wp) :: rtmp3(3)
     integer :: rep_cn(3), rep_vdw(3)
@@ -247,17 +245,15 @@ contains
     s18 = this%s18
     rs6 = this%rs6
     rs8 = this%rs18
-    rs10 = this%rs18
     alp6 = this%alp
     alp8 = alp6 + 2.0_wp
-    alp10 = alp8 + 2.0_wp
 
     call set_criteria(this%rthr, latvecs, rtmp3)
     rep_vdw(:) = int(rtmp3) + 1
     call set_criteria(this%cn_thr, latvecs, rtmp3)
     rep_cn(:) = int(rtmp3) + 1
     call pbcedisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, &
-        & r2r4, this%r0ab, rcov, rs6, rs8, rs10, alp6, alp8, alp10, &
+        & r2r4, this%r0ab, rcov, rs6, rs8, alp6, alp8, &
         & this%version, this%noabc, e6, e8, e10, e12, e6abc, latvecs, &
         & this%rthr, rep_vdw, this%cn_thr, rep_cn)
     disp = -e6 * this%s6 - e8 * this%s18 - e6abc
@@ -268,14 +264,14 @@ contains
 
     grads(:,:) = 0.0_wp
     call pbcgdisp(max_elem, maxc, natom, coords, izp, this%c6ab, this%mxc, &
-        & r2r4, this%r0ab, rcov, s6, s18, rs6, rs8, rs10, alp6, alp8, alp10, &
+        & r2r4, this%r0ab, rcov, s6, s18, rs6, rs8, alp6, alp8, &
         & this%noabc, this%numgrad, this%version, grads, disp2, gnorm, &
         & stress, latvecs, rep_vdw, rep_cn, this%rthr, .false., this%cn_thr)
     ! Note, the stress variable in pbcgdisp contains the *lattice derivatives*
     ! on return, so it needs to be converted to obtain the stress tensor.
     stress(:,:) = -matmul(stress, transpose(latvecs))&
         & / abs(determinant(latvecs))
-    
+
   end subroutine dftd3_pbc_dispersion
 
 
@@ -292,5 +288,5 @@ contains
 
   end function get_atomic_number
 
-  
+
 end module dftd3_api
