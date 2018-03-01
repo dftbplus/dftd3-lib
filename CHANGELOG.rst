@@ -3,6 +3,15 @@ Change Log
 ==========
 
 
+0.9.1
+=====
+
+Changed
+-------
+
+* Minor source code clean up
+
+
 0.9
 ===
 

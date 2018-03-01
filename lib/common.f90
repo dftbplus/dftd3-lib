@@ -49,7 +49,7 @@ module dftd3_common
   real(wp), parameter :: k3 = -4.
 
 
-  real(wp), parameter :: autoang =0.52917726d0
+  real(wp), parameter :: autoang = 0.52917726d0
   real(wp), parameter :: autokcal = 627.509541d0
   real(wp), parameter :: autoev = 27.21138505
   ! J/mol nm^6 - > au
@@ -58,23 +58,23 @@ module dftd3_common
 
 contains
 
-    subroutine limit(iat,jat,iadr,jadr)
-    integer iat,jat,iadr,jadr,i
+  subroutine limit(iat,jat,iadr,jadr)
+    integer, intent(inout) :: iat,jat
+    integer, intent(out) :: iadr,jadr
+    integer :: i
     iadr=1
     jadr=1
     i=100
-10  if (iat.gt.100) then
+    do while (iat .gt. 100)
       iat=iat-100
       iadr=iadr+1
-      goto 10
-    end if
+    end do
 
     i=100
-20  if (jat.gt.100) then
+    do while (jat .gt.100)
       jat=jat-100
       jadr=jadr+1
-      goto 20
-    end if
+    end do
 
   end subroutine limit
 
