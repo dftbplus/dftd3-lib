@@ -2,6 +2,14 @@
 Change Log
 ==========
 
+0.9.2
+=====
+
+Fixed
+-----
+
+* Missing initialisation in the gdisp() routine
+
 
 0.9.1
 =====
