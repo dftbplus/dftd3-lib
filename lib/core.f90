@@ -976,6 +976,7 @@ contains
     dc6i=0.0d0
     abccalc=.FALSE.
     abcthr=cn_thr
+    eabc = 0.0d0
 
     xyzTmp = xyz
 
