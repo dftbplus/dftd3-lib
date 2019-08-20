@@ -11,10 +11,12 @@ set(includedir ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 set_target_properties(dftd3 PROPERTIES Fortran_MODULE_DIRECTORY ${includedir})
 
-target_include_directories(dftd3 INTERFACE ${includedir})
+target_include_directories(dftd3 PUBLIC ${includedir})
 
 install(TARGETS dftd3
+  EXPORT dftd3-targets
   ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
   LIBRARY DESTINATION ${INSTALL_LIB_DIR})
 
 install(DIRECTORY ${includedir}/ DESTINATION ${INSTALL_MOD_DIR})
+
