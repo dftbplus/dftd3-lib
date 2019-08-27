@@ -4,7 +4,10 @@ project(libdftd3 VERSION 0.9.2 LANGUAGES Fortran)
 
 set(LIBRARY_ONLY FALSE CACHE BOOL "Whether only library should be compiled")
 
-# Installation paths
+option(BUILD_SHARED_LIBS "Whether the library should be a shared one" FALSE)
+
+option(INSTALL_INCLUDE_FILES "Whether include / module files should be installed" TRUE)
+
 set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH
   "Installation directory for executables")
 
