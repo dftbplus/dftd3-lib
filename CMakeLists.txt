@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 project(libdftd3 VERSION 0.9.2 LANGUAGES Fortran)
 
-set(LIBRARY_ONLY FALSE CACHE BOOL "Whether only library should be compiled")
-
 option(BUILD_SHARED_LIBS "Whether the library should be a shared one" FALSE)
 
 option(INSTALL_INCLUDE_FILES "Whether include / module files should be installed" TRUE)
