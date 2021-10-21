@@ -13,7 +13,7 @@ split into two parts:
 * A library with the core functionality. This can be directly used by third
   party applications wishing to calculate dispersion with the DFT-D3
   approach.
-  
+
 * Additional extensions which are necessary for the command line tool DFTD3 and
   the command line tool itself.
 
@@ -46,8 +46,8 @@ When using the library or the dftd3 tool, please cite:
 
   S. Grimme, J. Antony, S. Ehrlich and H. Krieg
   J. Chem. Phys, 132 (2010), 154104.
- 
-If BJ-damping is used 
+
+If BJ-damping is used
 
   S. Grimme, S. Ehrlich and L. Goerigk
   J. Comput. Chem, 32 (2011), 1456-1465.
