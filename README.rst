@@ -3,7 +3,7 @@ DFTD3
 =====
 
 This is a repackaged version of the `DFTD3 program
-<https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3/get-the-current-version-of-dft-d3>`_
+<http://www.thch.uni-bonn.de/tc/index.php?section=downloads&subsection=getd3>`_
 by S. Grimme and his coworkers.
 
 The original program (V3.1 Rev 1) was downloaded at 2016-04-03. It has been
@@ -20,7 +20,6 @@ split into two parts:
 * Updated dftd3 code to include refitted/modified zero- and BJ-damped D3
   versions of Sherrill and coworkers (-bjm and -zerom)
   (Functionality corresponds to V3.2 Rev0)
-
 
 Compilation
 ===========
