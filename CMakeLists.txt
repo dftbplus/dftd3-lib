@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(libdftd3 VERSION 0.9.2 LANGUAGES Fortran)
+project(libdftd3 VERSION 0.10 LANGUAGES Fortran)
 
 option(BUILD_SHARED_LIBS "Whether the library should be a shared one" FALSE)
 

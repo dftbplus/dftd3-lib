@@ -2,6 +2,16 @@
 Change Log
 ==========
 
+
+0.10
+====
+
+Added
+-----
+
+* CMake based build system
+
+
 0.9.2
 =====
 
