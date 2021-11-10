@@ -2,6 +2,21 @@
 Change Log
 ==========
 
+
+0.10
+====
+
+Added
+-----
+
+* CMake based build system
+
+Fixed
+-----
+
+* Corrected entry in the <r^2>/<r^4> data for Ba
+
+
 0.9.2
 =====
 
