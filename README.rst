@@ -1,6 +1,12 @@
-=====
-DFTD3
-=====
+==================
+DFTD3 (deprecated)
+==================
+
+**NOTE:** This library is **deprecated** and is not developed or maintained any
+more. Please use the  `simple-dftd3 library
+<https://github.com/dftd3/simple-dftd3>`_  instead.
+
+
 
 This is a repackaged version of the `DFTD3 program
 <http://www.thch.uni-bonn.de/tc/index.php?section=downloads&subsection=getd3>`_
