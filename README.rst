@@ -4,7 +4,7 @@ DFTD3 (deprecated)
 
 **NOTE:** This library is **deprecated** and is not developed or maintained any
 more. Please use the  `simple-dftd3 library
-<https://github.com/dftd3/simple-dftd3>`_  instead.
+<https://dftd3.readthedocs.io>`_  instead.
 
 
 
